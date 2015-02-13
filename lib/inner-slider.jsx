@@ -1,5 +1,3 @@
-"use strict";
-
 var React = require('react');
 var cloneWithProps = require('react/lib/cloneWithProps');
 var cx = require('react/lib/cx');
@@ -7,7 +5,7 @@ var EventHandlersMixin = require('./mixins/event-handlers');
 var HelpersMixin = require('./mixins/helpers');
 var initialState = require('./initial-state');
 var defaultProps = require('./default-props');
-var _assign = require('lodash.assign');
+var _ = require('lodash');
 
 var Slider = React.createClass({
   mixins: [EventHandlersMixin, HelpersMixin],
@@ -53,13 +51,11 @@ var Slider = React.createClass({
     var postCloneSlides = [];
     var count = React.Children.count(this.props.children);
     React.Children.forEach(this.props.children, function (child, index) {
-      var infiniteCount;
-
       slides.push(cloneWithProps(child, {
         key: index,
         'data-index': index,
         className: this.getSlideClasses(index),
-        style: _assign({}, this.getSlideStyle(), child.props.style),
+        style: _.assign({}, this.getSlideStyle(), child.props.style),
       }));
 
       if (this.props.infinite === true) {
@@ -75,7 +71,7 @@ var Slider = React.createClass({
             key: key,
             'data-index': key,
             className: this.getSlideClasses(key),
-            style: _assign({}, this.getSlideStyle(), child.props.style),
+            style: _.assign({}, this.getSlideStyle(), child.props.style),
           }));
         }
 
@@ -85,7 +81,7 @@ var Slider = React.createClass({
             key: key,
             'data-index': key,
             className: this.getSlideClasses(key),
-            style: _assign({}, this.getSlideStyle(), child.props.style),
+            style: _.assign({}, this.getSlideStyle(), child.props.style),
           }));
         }
       }
@@ -124,7 +120,7 @@ var Slider = React.createClass({
   render: function () {
     return (
       <div className={'slick-initialized slick-slider ' + this.props.className} >
-        <div
+        <div 
           ref='list'
           className='slick-list'
           style={this.getListStyle()}
