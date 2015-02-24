@@ -42,7 +42,6 @@ var SimpleSlider = React.createClass({
   }
 });
 ```
-
 |    Property    | Type |          Description          | Working |
 | -------------  | ---- |          -----------          | ------- |
 | className      | String |Additional class name for the inner slider div | Yes | 
