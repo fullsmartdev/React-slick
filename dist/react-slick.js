@@ -329,7 +329,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.adaptHeight();
 	  },
 	  onWindowResized: function onWindowResized() {
-	    this.update(this.props);
+	    this.initialize(this.props);
 	  },
 	  render: function render() {
 	    var className = (0, _classnames2['default'])('slick-initialized', 'slick-slider', this.props.className);
