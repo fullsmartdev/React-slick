@@ -2,6 +2,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+import ReactTransitionEvents from 'react/lib/ReactTransitionEvents';
 import {getTrackCSS, getTrackLeft, getTrackAnimateCSS} from './trackHelper';
 import assign from 'object-assign';
 
@@ -111,14 +112,14 @@ var helpers = {
         if (this.props.afterChange) {
           this.props.afterChange(targetSlide);
         }
-        delete this.animationEndCallback;
+        ReactTransitionEvents.removeEndEventListener(ReactDOM.findDOMNode(this.refs.track).children[currentSlide], callback);
       };
 
       this.setState({
         animating: true,
         currentSlide: targetSlide
       }, function () {
-        this.animationEndCallback = setTimeout(callback, this.props.speed);
+        ReactTransitionEvents.addEndEventListener(ReactDOM.findDOMNode(this.refs.track).children[currentSlide], callback);
       });
 
       if (this.props.beforeChange) {
@@ -214,7 +215,7 @@ var helpers = {
         if (this.props.afterChange) {
           this.props.afterChange(currentSlide);
         }
-        delete this.animationEndCallback;
+        ReactTransitionEvents.removeEndEventListener(ReactDOM.findDOMNode(this.refs.track), callback);
       };
 
       this.setState({
@@ -222,7 +223,7 @@ var helpers = {
         currentSlide: currentSlide,
         trackStyle: getTrackAnimateCSS(assign({left: targetLeft}, this.props, this.state))
       }, function () {
-        this.animationEndCallback = setTimeout(callback, this.props.speed);
+        ReactTransitionEvents.addEndEventListener(ReactDOM.findDOMNode(this.refs.track), callback);
       });
 
     }
