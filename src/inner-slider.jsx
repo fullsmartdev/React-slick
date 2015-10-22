@@ -52,9 +52,6 @@ export var InnerSlider = React.createClass({
     }
   },
   componentWillReceiveProps: function(nextProps) {
-    if (this.props.initialSlide != nextProps.initialSlide) {
-      this.setState({currentSlide: nextProps.initialSlide});
-    }
     this.update(nextProps);
   },
   componentDidUpdate: function () {
