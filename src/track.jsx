@@ -66,21 +66,12 @@ var renderSlides = (spec) => {
       child = (<div></div>);
     }
     var childStyle = getSlideStyle(assign({}, spec, {index: index}));
-    var slickClasses = getSlideClasses(assign({index: index}, spec));
-    var cssClasses;
-
-    if (child.props.className) {
-        cssClasses = classnames(slickClasses, child.props.className);
-    }
-    else {
-        cssClasses = slickClasses;
-    }
 
     slides.push(React.cloneElement(child, {
       key: index,
       'data-index': index,
-      className: cssClasses,
-      style: Object.assign({}, child.props.style || {}, childStyle)
+      className: getSlideClasses(assign({index: index}, spec)),
+      style: assign({}, child.props.style || {}, childStyle)
     }));
 
     // variableWidth doesn't wrap properly.
@@ -93,7 +84,7 @@ var renderSlides = (spec) => {
           key: key,
           'data-index': key,
           className: getSlideClasses(assign({index: key}, spec)),
-          style: Object.assign({}, child.props.style || {}, childStyle)
+          style: assign({}, child.props.style || {}, childStyle)
         }));
       }
 
@@ -103,7 +94,7 @@ var renderSlides = (spec) => {
           key: key,
           'data-index': key,
           className: getSlideClasses(assign({index: key}, spec)),
-          style: Object.assign({}, child.props.style || {}, childStyle)
+          style: assign({}, child.props.style || {}, childStyle)
         }));
       }
     }
