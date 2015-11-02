@@ -1,6 +1,7 @@
 'use strict';
 
 import React from 'react';
+import cloneWithProps from 'react/lib/cloneWithProps';
 import assign from 'object-assign';
 import classnames from 'classnames';
 
@@ -65,22 +66,13 @@ var renderSlides = (spec) => {
     } else {
       child = (<div></div>);
     }
+
     var childStyle = getSlideStyle(assign({}, spec, {index: index}));
-    var slickClasses = getSlideClasses(assign({index: index}, spec));
-    var cssClasses;
-
-    if (child.props.className) {
-        cssClasses = classnames(slickClasses, child.props.className);
-    }
-    else {
-        cssClasses = slickClasses;
-    }
-
-    slides.push(React.cloneElement(child, {
+    slides.push(cloneWithProps(child, {
       key: index,
       'data-index': index,
-      className: cssClasses,
-      style: Object.assign({}, child.props.style || {}, childStyle)
+      className: getSlideClasses(assign({index: index}, spec)),
+      style: childStyle
     }));
 
     // variableWidth doesn't wrap properly.
@@ -89,21 +81,21 @@ var renderSlides = (spec) => {
 
       if (index >= (count - infiniteCount)) {
         key = -(count - index);
-        preCloneSlides.push(React.cloneElement(child, {
+        preCloneSlides.push(cloneWithProps(child, {
           key: key,
           'data-index': key,
           className: getSlideClasses(assign({index: key}, spec)),
-          style: Object.assign({}, child.props.style || {}, childStyle)
+          style: childStyle
         }));
       }
 
       if (index < infiniteCount) {
         key = count + index;
-        postCloneSlides.push(React.cloneElement(child, {
+        postCloneSlides.push(cloneWithProps(child, {
           key: key,
           'data-index': key,
           className: getSlideClasses(assign({index: key}, spec)),
-          style: Object.assign({}, child.props.style || {}, childStyle)
+          style: childStyle
         }));
       }
     }
