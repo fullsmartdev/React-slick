@@ -79,6 +79,10 @@ var helpers = {
     var targetLeft, currentLeft;
     var callback;
 
+    if (this.props.waitForAnimate && this.state.animating) {
+	return;
+    }
+
     if (this.state.currentSlide === index) {
       return;
     }
@@ -253,7 +257,7 @@ var helpers = {
           this.state.currentSlide - this.props.slidesToScroll:
           this.state.currentSlide + this.props.slidesToScroll;
 
-        this.slideHandler(nextIndex%this.state.slideCount);
+        this.slideHandler(nextIndex);
       }
     };
     if (this.props.autoplay) {
