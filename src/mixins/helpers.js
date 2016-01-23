@@ -110,7 +110,7 @@ var helpers = {
           animating: false
         });
         if (this.props.afterChange) {
-          this.props.afterChange(targetSlide);
+          this.props.afterChange(currentSlide);
         }
         ReactTransitionEvents.removeEndEventListener(ReactDOM.findDOMNode(this.refs.track).children[currentSlide], callback);
       };
@@ -123,7 +123,7 @@ var helpers = {
       });
 
       if (this.props.beforeChange) {
-        this.props.beforeChange(this.state.currentSlide, targetSlide);
+        this.props.beforeChange(this.state.currentSlide, currentSlide);
       }
 
       this.autoPlay();
