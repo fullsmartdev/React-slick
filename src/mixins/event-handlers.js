@@ -12,11 +12,8 @@ var EventHandlers = {
 
     if (options.message === 'previous') {
       slideOffset = (indexOffset === 0) ? this.props.slidesToScroll : this.props.slidesToShow - indexOffset;
-      targetSlide = this.state.currentSlide - slideOffset;
-      if (this.props.lazyLoad) {
-        previousInt = this.state.currentSlide - slideOffset;
-        targetSlide = previousInt === -1 ? this.state.slideCount -1 : previousInt;
-      }
+      previousInt = this.state.currentSlide - slideOffset;
+      targetSlide = previousInt === -1 ? this.state.slideCount -1 : previousInt;
     } else if (options.message === 'next') {
       slideOffset = (indexOffset === 0) ? this.props.slidesToScroll : indexOffset;
       targetSlide = this.state.currentSlide + slideOffset;
