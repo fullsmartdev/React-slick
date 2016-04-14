@@ -20,6 +20,7 @@ export var PrevArrow = React.createClass({
 
     var prevArrowProps = {
       key: '0',
+      ref: 'previous',
       'data-role': 'none',
       className: classnames(prevClasses),
       style: {display: 'block'},
@@ -67,6 +68,7 @@ export var NextArrow = React.createClass({
 
     var nextArrowProps = {
       key: '1',
+      ref: 'next',
       'data-role': 'none',
       className: classnames(nextClasses),
       style: {display: 'block'},

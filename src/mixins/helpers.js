@@ -224,7 +224,10 @@ var helpers = {
 
     }
 
-    this.autoPlay();
+    if (!this.state.autoPlayTimer) {
+      this.autoPlay();
+    }
+
   },
   swipeDirection: function (touchObject) {
     var xDist, yDist, r, swipeAngle;
@@ -247,9 +250,6 @@ var helpers = {
     return 'vertical';
   },
   autoPlay: function () {
-    if (this.state.autoPlayTimer) {
-      return;
-    }
     var play = () => {
       if (this.state.mounted) {
         var nextIndex = this.props.rtl ?
