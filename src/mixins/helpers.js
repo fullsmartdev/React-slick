@@ -224,10 +224,7 @@ var helpers = {
 
     }
 
-    if (!this.state.autoPlayTimer) {
-      this.autoPlay();
-    }
-
+    this.autoPlay();
   },
   swipeDirection: function (touchObject) {
     var xDist, yDist, r, swipeAngle;
@@ -250,6 +247,9 @@ var helpers = {
     return 'vertical';
   },
   autoPlay: function () {
+    if (this.state.autoPlayTimer) {
+      return;
+    }
     var play = () => {
       if (this.state.mounted) {
         var nextIndex = this.props.rtl ?
@@ -267,6 +267,9 @@ var helpers = {
   pause: function () {
     if (this.state.autoPlayTimer) {
       window.clearInterval(this.state.autoPlayTimer);
+      this.setState({
+        autoPlayTimer: null
+      });
     }
   }
 };
