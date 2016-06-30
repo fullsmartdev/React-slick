@@ -41,13 +41,9 @@ export var Dots = React.createClass({
         currentSlide: this.props.currentSlide
       };
 
-      var onClick = this.clickHandler.bind(this, dotOptions);
-
-      var element = this.props.children[i];
-
       return (
         <li key={i} className={className}>
-          {this.props.customPaging(onClick, i, element)}
+          <button onClick={this.clickHandler.bind(this, dotOptions)}>{i + 1}</button>
         </li>
       );
     });

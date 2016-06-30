@@ -1,5 +1,3 @@
-import React from 'react';
-
 var defaultProps = {
     className: '',
     // accessibility: true,
@@ -10,9 +8,6 @@ var defaultProps = {
     centerMode: false,
     centerPadding: '50px',
     cssEase: 'ease',
-    customPaging: function(onClick, i, element) {
-        return <button onClick={onClick}>{i + 1}</button>;
-    },
     dots: false,
     dotsClass: 'slick-dots',
     draggable: true,
