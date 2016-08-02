@@ -86,12 +86,6 @@ var helpers = {
     if (this.props.fade) {
       currentSlide = this.state.currentSlide;
 
-      // Don't change slide if it's not infite and current slide is the first or last slide.
-      if(this.props.infinite === false &&
-        (index < 0 || index >= this.state.slideCount)) {
-        return;
-      } 
-
       //  Shifting targetSlide back into the range
       if (index < 0) {
         targetSlide = index + this.state.slideCount;
@@ -151,11 +145,6 @@ var helpers = {
       }
     } else {
       currentSlide = targetSlide;
-    }
-
-    // Don't change slide if it's not infite and current slide is the first or last slide page.
-    if(currentSlide === this.state.currentSlide && this.props.infinite === false) {
-      return;
     }
 
     targetLeft = getTrackLeft(assign({
