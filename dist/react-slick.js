@@ -340,22 +340,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      nextArrow = _react2.default.createElement(_arrows.NextArrow, arrowProps);
 	    }
 
-	    var centerPaddingStyle = null;
-
-	    if (this.props.vertical === false) {
-	      if (this.props.centerMode === true) {
-	        centerPaddingStyle = {
-	          padding: '0px ' + this.props.centerPadding
-	        };
-	      }
-	    } else {
-	      if (this.props.centerMode === true) {
-	        centerPaddingStyle = {
-	          padding: this.props.centerPadding + ' 0px'
-	        };
-	      }
-	    }
-
 	    return _react2.default.createElement(
 	      'div',
 	      { className: className, onMouseEnter: this.onInnerSliderEnter, onMouseLeave: this.onInnerSliderLeave },
@@ -364,7 +348,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        {
 	          ref: 'list',
 	          className: 'slick-list',
-	          style: centerPaddingStyle,
 	          onMouseDown: this.swipeStart,
 	          onMouseMove: this.state.dragging ? this.swipeMove : null,
 	          onMouseUp: this.swipeEnd,
