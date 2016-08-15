@@ -21,7 +21,8 @@ var EventHandlers = {
       }
     } else if (options.message === 'next') {
       slideOffset = (indexOffset === 0) ? slidesToScroll : indexOffset;
-      targetSlide = currentSlide + slideOffset;
+      // targetSlide = currentSlide + slideOffset;
+      targetSlide = ((currentSlide + slidesToScroll) % slideCount) + indexOffset;
     } else if (options.message === 'dots') {
       // Click on dots
       targetSlide = options.index * options.slidesToScroll;
@@ -36,12 +37,6 @@ var EventHandlers = {
     }
 
     this.slideHandler(targetSlide);
-  },
-  previous: function () {
-    this.changeSlide({message: 'previous'});
-  },
-  next: function () {
-    this.changeSlide({message: 'next'});
   },
   // Accessiblity handler for previous and next
   keyHandler: function (e) {

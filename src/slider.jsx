@@ -39,15 +39,6 @@ var Slider = React.createClass({
       });
     }
   },
-
-  previous: function () {
-    this.innerSlider.previous();
-  },
-
-  next: function () {
-    this.innerSlider.next();
-  },
-
   render: function () {
     var settings;
     var newProps;
@@ -75,7 +66,7 @@ var Slider = React.createClass({
       );
     } else {
       return (
-        <InnerSlider ref={ref => this.innerSlider = ref} {...settings}>
+        <InnerSlider {...settings}>
           {children}
         </InnerSlider>
       );

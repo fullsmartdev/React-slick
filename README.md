@@ -107,9 +107,7 @@ var SimpleSlider = React.createClass({
 | vertical | bool |||
 | afterChange | function | callback function called after the current index changes | Yes |
 | beforeChange | function | callback function called before the current index changes | Yes |
-| slickGoTo | int | go to the specified slide number | |
-| next           | function | function called to change current slide on next slide | Yes |
-| previous       | function | function called to change current slide on previous slide  | Yes |
+| slickGoTo | int | go to the specified slide number
 
 ### Custom next/prev arrows
 
