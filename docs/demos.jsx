@@ -7,10 +7,8 @@ import SimpleSlider from '../examples/SimpleSlider'
 import SlideChangeHooks from '../examples/SlideChangeHooks'
 import MultipleItems from '../examples/MultipleItems'
 import Responsive from '../examples/Responsive'
-import UnevenSetsInfinite from '../examples/UnevenSetsInfinite'
-import UnevenSetsFinite from '../examples/UnevenSetsFinite'
+import UnevenSets from '../examples/UnevenSets'
 import CenterMode from '../examples/CenterMode'
-import FocusOnSelect from '../examples/FocusOnSelect'
 import AutoPlay from '../examples/AutoPlay'
 import PauseOnHover from '../examples/PauseOnHover'
 import Rtl from '../examples/Rtl'
@@ -20,8 +18,7 @@ import LazyLoad from '../examples/LazyLoad'
 import Fade from '../examples/Fade'
 import SlickGoTo from '../examples/SlickGoTo'
 import CustomArrows from '../examples/CustomArrows'
-import DynamicSlides  from '../examples/DynamicSlides'
-
+import PreviousNextMethods from '../examples/PreviousNextMethods'
 
 export default class App extends React.Component {
   render() {
@@ -30,10 +27,8 @@ export default class App extends React.Component {
         <SimpleSlider />
         <MultipleItems />
         <Responsive />
-        <UnevenSetsInfinite />
-        <UnevenSetsFinite />
+        <UnevenSets />
         <CenterMode />
-        <FocusOnSelect />
         <AutoPlay />
         <PauseOnHover />
         <Rtl />
@@ -44,7 +39,7 @@ export default class App extends React.Component {
         <SlideChangeHooks />
         <SlickGoTo />
         <CustomArrows />
-        <DynamicSlides />
+        <PreviousNextMethods />
       </div>
     );
   }

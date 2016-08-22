@@ -2,6 +2,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+import ReactTransitionEvents from 'react/lib/ReactTransitionEvents';
 import {getTrackCSS, getTrackLeft, getTrackAnimateCSS} from './trackHelper';
 import assign from 'object-assign';
 
@@ -89,12 +90,6 @@ var helpers = {
     if (this.props.fade) {
       currentSlide = this.state.currentSlide;
 
-      // Don't change slide if it's not infite and current slide is the first or last slide.
-      if(this.props.infinite === false &&
-        (index < 0 || index >= this.state.slideCount)) {
-        return;
-      } 
-
       //  Shifting targetSlide back into the range
       if (index < 0) {
         targetSlide = index + this.state.slideCount;
@@ -117,14 +112,14 @@ var helpers = {
         if (this.props.afterChange) {
           this.props.afterChange(targetSlide);
         }
-        delete this.animationEndCallback;
+        ReactTransitionEvents.removeEndEventListener(ReactDOM.findDOMNode(this.refs.track).children[currentSlide], callback);
       };
 
       this.setState({
         animating: true,
         currentSlide: targetSlide
       }, function () {
-        this.animationEndCallback = setTimeout(callback, this.props.speed);
+        ReactTransitionEvents.addEndEventListener(ReactDOM.findDOMNode(this.refs.track).children[currentSlide], callback);
       });
 
       if (this.props.beforeChange) {
@@ -154,11 +149,6 @@ var helpers = {
       }
     } else {
       currentSlide = targetSlide;
-    }
-
-    // Don't change slide if it's not infite and current slide is the first or last slide page.
-    if(currentSlide === this.state.currentSlide && this.props.infinite === false) {
-      return;
     }
 
     targetLeft = getTrackLeft(assign({
@@ -225,7 +215,7 @@ var helpers = {
         if (this.props.afterChange) {
           this.props.afterChange(currentSlide);
         }
-        delete this.animationEndCallback;
+        ReactTransitionEvents.removeEndEventListener(ReactDOM.findDOMNode(this.refs.track), callback);
       };
 
       this.setState({
@@ -233,7 +223,7 @@ var helpers = {
         currentSlide: currentSlide,
         trackStyle: getTrackAnimateCSS(assign({left: targetLeft}, this.props, this.state))
       }, function () {
-        this.animationEndCallback = setTimeout(callback, this.props.speed);
+        ReactTransitionEvents.addEndEventListener(ReactDOM.findDOMNode(this.refs.track), callback);
       });
 
     }

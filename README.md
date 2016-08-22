@@ -72,7 +72,6 @@ var SimpleSlider = React.createClass({
 
 |    Property    | Type |          Description          | Working |
 | -------------  | ---- |          -----------          | ------- |
-| accessibility  | bool | Enables tabbing and arrow key navigation | Yes |
 | className      | String |Additional class name for the inner slider div | Yes |
 | adaptiveHeight | bool | Adjust the slide's height automatically | Yes |
 | arrows         | bool | Should we show Left and right nav arrows | Yes |
@@ -88,7 +87,7 @@ var SimpleSlider = React.createClass({
 | draggable      | bool | Is the gallery scrollable via dragging on desktop? | Yes |
 | easing         | string | | |
 | fade           | bool | Slides use fade for transition  | Yes |
-| focusOnSelect  | bool | Go to slide on click | Yes |
+| focusOnSelect  | bool | | |
 | infinite       | bool | should the gallery wrap around it's contents | Yes |
 | initialSlide   | int | which item should be the first to be displayed | Yes |
 | lazyLoad       | bool | Loads images or renders components on demands | Yes |
@@ -108,7 +107,9 @@ var SimpleSlider = React.createClass({
 | vertical | bool |||
 | afterChange | function | callback function called after the current index changes | Yes |
 | beforeChange | function | callback function called before the current index changes | Yes |
-| slickGoTo | int | go to the specified slide number
+| slickGoTo | int | go to the specified slide number | |
+| next           | function | function called to change current slide on next slide | Yes |
+| previous       | function | function called to change current slide on previous slide  | Yes |
 
 ### Custom next/prev arrows
 

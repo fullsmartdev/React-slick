@@ -55,7 +55,7 @@ var getKey = (child, fallbackKey) => {
     return (child.key === null || child.key === undefined) ? fallbackKey : child.key;
 };
 
-var renderSlides = function (spec) {
+var renderSlides = (spec) => {
   var key;
   var slides = [];
   var preCloneSlides = [];
@@ -64,13 +64,6 @@ var renderSlides = function (spec) {
   var child;
 
   React.Children.forEach(spec.children, (elem, index) => {
-    var childOnClickOptions = {
-      message: 'children',
-      index: index,
-      slidesToScroll: spec.slidesToScroll,
-      currentSlide: spec.currentSlide
-    };
-
     if (!spec.lazyLoad | (spec.lazyLoad && spec.lazyLoadedList.indexOf(index) >= 0)) {
       child = elem;
     } else {
@@ -90,9 +83,7 @@ var renderSlides = function (spec) {
       key: 'original' + getKey(child, index),
       'data-index': index,
       className: cssClasses,
-      tabIndex: '-1',
-      style: assign({outline: 'none'}, child.props.style || {}, childStyle),
-      onClick: spec.focusOnSelect.bind(null, childOnClickOptions)
+      style: assign({}, child.props.style || {}, childStyle)
     }));
 
     // variableWidth doesn't wrap properly.
@@ -105,8 +96,7 @@ var renderSlides = function (spec) {
           key: 'precloned' + getKey(child, key),
           'data-index': key,
           className: cssClasses,
-          style: assign({}, child.props.style || {}, childStyle),
-          onClick: this.props.focusOnSelect.bind(null, childOnClickOptions)
+          style: assign({}, child.props.style || {}, childStyle)
         }));
       }
 
@@ -116,8 +106,7 @@ var renderSlides = function (spec) {
           key: 'postcloned' + getKey(child, key),
           'data-index': key,
           className: cssClasses,
-          style: assign({}, child.props.style || {}, childStyle),
-          onClick: this.props.focusOnSelect.bind(null, childOnClickOptions)
+          style: assign({}, child.props.style || {}, childStyle)
         }));
       }
     }
@@ -134,7 +123,7 @@ var renderSlides = function (spec) {
 
 export var Track = React.createClass({
   render: function () {
-    var slides = renderSlides.call(this, this.props);
+    var slides = renderSlides(this.props);
     return (
       <div className='slick-track' style={this.props.trackStyle}>
         { slides }

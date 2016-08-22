@@ -14,9 +14,7 @@ import {PrevArrow, NextArrow} from './arrows';
 export var InnerSlider = React.createClass({
   mixins: [HelpersMixin, EventHandlersMixin],
   getInitialState: function () {
-    return Object.assign({}, initialState, {
-      currentSlide: this.props.initialSlide
-    });
+    return initialState;
   },
   getDefaultProps: function () {
     return defaultProps;
@@ -52,9 +50,6 @@ export var InnerSlider = React.createClass({
     }
   },
   componentWillUnmount: function componentWillUnmount() {
-    if (this.animationEndCallback) {
-      clearTimeout(this.animationEndCallback);
-    }
     if (window.addEventListener) {
       window.removeEventListener('resize', this.onWindowResized);
     } else {
@@ -69,13 +64,6 @@ export var InnerSlider = React.createClass({
       this.changeSlide({
           message: 'index',
           index: nextProps.slickGoTo,
-          currentSlide: this.state.currentSlide
-      });
-    } else if (this.state.currentSlide >= nextProps.children.length) {
-      this.update(nextProps);
-      this.changeSlide({
-          message: 'index',
-          index: nextProps.children.length - nextProps.slidesToShow,
           currentSlide: this.state.currentSlide
       });
     } else {
@@ -101,14 +89,12 @@ export var InnerSlider = React.createClass({
       speed: this.props.speed,
       infinite: this.props.infinite,
       centerMode: this.props.centerMode,
-      focusOnSelect: this.props.focusOnSelect ? this.selectHandler : new Function(),
       currentSlide: this.state.currentSlide,
       lazyLoad: this.props.lazyLoad,
       lazyLoadedList: this.state.lazyLoadedList,
       rtl: this.props.rtl,
       slideWidth: this.state.slideWidth,
       slidesToShow: this.props.slidesToShow,
-      slidesToScroll: this.props.slidesToScroll,
       slideCount: this.state.slideCount,
       trackStyle: this.state.trackStyle,
       variableWidth: this.props.variableWidth
@@ -165,7 +151,6 @@ export var InnerSlider = React.createClass({
 
     return (
       <div className={className} onMouseEnter={this.onInnerSliderEnter} onMouseLeave={this.onInnerSliderLeave}>
-        {prevArrow}
         <div
           ref='list'
           className="slick-list"
@@ -177,12 +162,12 @@ export var InnerSlider = React.createClass({
           onTouchStart={this.swipeStart}
           onTouchMove={this.state.dragging ? this.swipeMove: null}
           onTouchEnd={this.swipeEnd}
-          onTouchCancel={this.state.dragging ? this.swipeEnd: null}
-          onKeyDown={this.props.accessibility ? this.keyHandler : null}>
+          onTouchCancel={this.state.dragging ? this.swipeEnd: null}>
           <Track ref='track' {...trackProps}>
             {this.props.children}
           </Track>
         </div>
+        {prevArrow}
         {nextArrow}
         {dots}
       </div>
