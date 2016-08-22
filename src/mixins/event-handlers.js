@@ -22,7 +22,10 @@ var EventHandlers = {
     } else if (options.message === 'next') {
       slideOffset = (indexOffset === 0) ? slidesToScroll : indexOffset;
       targetSlide = currentSlide + slideOffset;
-    } else if (options.message === 'dots') {
+      if (this.props.lazyLoad) {
+        targetSlide = ((currentSlide + slidesToScroll) % slideCount) + indexOffset;
+      }
+    } else if (options.message === 'dots' || options.message === 'children') {
       // Click on dots
       targetSlide = options.index * options.slidesToScroll;
       if (targetSlide === options.currentSlide) {
@@ -37,19 +40,25 @@ var EventHandlers = {
 
     this.slideHandler(targetSlide);
   },
-  previous: function () {
-    this.changeSlide({message: 'previous'});
-  },
-  next: function () {
-    this.changeSlide({message: 'next'});
-  },
+ 
   // Accessiblity handler for previous and next
   keyHandler: function (e) {
-
+    //Dont slide if the cursor is inside the form fields and arrow keys are pressed
+    if(!e.target.tagName.match('TEXTAREA|INPUT|SELECT')) {
+        if (e.keyCode === 37 && this.props.accessibility === true) {
+            this.changeSlide({
+              message: this.props.rtl === true ? 'next' :  'previous'
+            });
+        } else if (e.keyCode === 39 && this.props.accessibility === true) {
+            this.changeSlide({
+              message: this.props.rtl === true ? 'previous' : 'next'
+            });
+        }
+    }
   },
   // Focus on selecting a slide (click handler on track)
-  selectHandler: function (e) {
-
+  selectHandler: function (options) {
+    this.changeSlide(options)
   },
   swipeStart: function (e) {
     var touches, posX, posY;
