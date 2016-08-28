@@ -14,7 +14,7 @@ var Slider = React.createClass({
       breakpoint: null
     };
   },
-  componentWillMount: function () {
+  componentDidMount: function () {
     if (this.props.responsive) {
       var breakpoints = this.props.responsive.map(breakpt => breakpt.breakpoint);
       breakpoints.sort((x, y) => x - y);
@@ -39,19 +39,6 @@ var Slider = React.createClass({
       });
     }
   },
-
-  slickPrev: function () {
-    this.refs.innerSlider.slickPrev();
-  },
-
-  slickNext: function () {
-    this.refs.innerSlider.slickNext();
-  },
-
-  slickGoTo: function (slide) {
-    this.refs.innerSlider.slickGoTo(slide)
-  },
-
   render: function () {
     var settings;
     var newProps;
@@ -79,7 +66,7 @@ var Slider = React.createClass({
       );
     } else {
       return (
-        <InnerSlider ref='innerSlider' {...settings}>
+        <InnerSlider {...settings}>
           {children}
         </InnerSlider>
       );

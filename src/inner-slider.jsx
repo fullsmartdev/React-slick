@@ -52,9 +52,6 @@ export var InnerSlider = React.createClass({
     }
   },
   componentWillUnmount: function componentWillUnmount() {
-    if (this.animationEndCallback) {
-      clearTimeout(this.animationEndCallback);
-    }
     if (window.addEventListener) {
       window.removeEventListener('resize', this.onWindowResized);
     } else {
@@ -66,19 +63,9 @@ export var InnerSlider = React.createClass({
   },
   componentWillReceiveProps: function(nextProps) {
     if (this.props.slickGoTo != nextProps.slickGoTo) {
-      if (process.env.NODE_ENV !== 'production') {
-        console.warn('react-slick deprecation warning: slickGoTo prop is deprecated and it will be removed in next release. Use slickGoTo method instead')
-      }
       this.changeSlide({
           message: 'index',
           index: nextProps.slickGoTo,
-          currentSlide: this.state.currentSlide
-      });
-    } else if (this.state.currentSlide >= nextProps.children.length) {
-      this.update(nextProps);
-      this.changeSlide({
-          message: 'index',
-          index: nextProps.children.length - nextProps.slidesToShow,
           currentSlide: this.state.currentSlide
       });
     } else {
@@ -94,19 +81,6 @@ export var InnerSlider = React.createClass({
     this.setState({
       animating: false 
     })
-  },
-  slickPrev: function () {
-    this.changeSlide({message: 'previous'});
-  },
-  slickNext: function () {
-    this.changeSlide({message: 'next'});
-  },
-  slickGoTo: function (slide) {
-    slide && this.changeSlide({
-      message: 'index',
-      index: slide,
-      currentSlide: this.state.currentSlide
-    });
   },
   render: function () {
     var className = classnames('slick-initialized', 'slick-slider', this.props.className);
@@ -181,7 +155,6 @@ export var InnerSlider = React.createClass({
 
     return (
       <div className={className} onMouseEnter={this.onInnerSliderEnter} onMouseLeave={this.onInnerSliderLeave}>
-        {prevArrow}
         <div
           ref='list'
           className="slick-list"
@@ -193,12 +166,12 @@ export var InnerSlider = React.createClass({
           onTouchStart={this.swipeStart}
           onTouchMove={this.state.dragging ? this.swipeMove: null}
           onTouchEnd={this.swipeEnd}
-          onTouchCancel={this.state.dragging ? this.swipeEnd: null}
-          onKeyDown={this.props.accessibility ? this.keyHandler : null}>
+          onTouchCancel={this.state.dragging ? this.swipeEnd: null}>
           <Track ref='track' {...trackProps}>
             {this.props.children}
           </Track>
         </div>
+        {prevArrow}
         {nextArrow}
         {dots}
       </div>

@@ -61,10 +61,9 @@ var renderSlides = function (spec) {
   var preCloneSlides = [];
   var postCloneSlides = [];
   var count = React.Children.count(spec.children);
-
+  var child;
 
   React.Children.forEach(spec.children, (elem, index) => {
-    let child;
     var childOnClickOptions = {
       message: 'children',
       index: index,
@@ -87,18 +86,12 @@ var renderSlides = function (spec) {
         cssClasses = slickClasses;
     }
 
-    const onClick = function(e) {
-      child.props && child.props.onClick && child.props.onClick(e)
-      spec.focusOnSelect(childOnClickOptions)
-    }
-
     slides.push(React.cloneElement(child, {
       key: 'original' + getKey(child, index),
       'data-index': index,
       className: cssClasses,
-      tabIndex: '-1',
-      style: assign({outline: 'none'}, child.props.style || {}, childStyle),
-      onClick
+      style: assign({}, child.props.style || {}, childStyle),
+      onClick: spec.focusOnSelect.bind(null, childOnClickOptions)
     }));
 
     // variableWidth doesn't wrap properly.
@@ -112,7 +105,7 @@ var renderSlides = function (spec) {
           'data-index': key,
           className: cssClasses,
           style: assign({}, child.props.style || {}, childStyle),
-          onClick
+          onClick: this.props.focusOnSelect.bind(null, childOnClickOptions)
         }));
       }
 
@@ -123,7 +116,7 @@ var renderSlides = function (spec) {
           'data-index': key,
           className: cssClasses,
           style: assign({}, child.props.style || {}, childStyle),
-          onClick
+          onClick: this.props.focusOnSelect.bind(null, childOnClickOptions)
         }));
       }
     }

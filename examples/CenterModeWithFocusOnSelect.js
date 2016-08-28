@@ -1,18 +1,21 @@
 import React, { Component } from 'react'
 import Slider from '../src/slider'
 
-export default class UnevenSetsInfinite extends Component {
+export default class CenterModeWithFocusOnSelect extends Component {
   render() {
-    var settings = {
+    const settings = {
+      className: 'center',
+      focusOnSelect: true,
+      centerMode: true,
       dots: true,
-      infinite: true,
-      speed: 500,
-      slidesToScroll: 4,
-      slidesToShow: 4
+      infinite: false,
+      slidesToShow: 5,
+      slidesToScroll: 1,
+      speed: 500
     };
     return (
       <div>
-        <h2>Uneven sets (infinite)</h2>
+        <h2>Center Mode with FocusOnSelect</h2>
         <Slider {...settings}>
           <div><h3>1</h3></div>
           <div><h3>2</h3></div>
