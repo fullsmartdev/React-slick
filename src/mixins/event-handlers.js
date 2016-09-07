@@ -100,7 +100,15 @@ var EventHandlers = {
     touchObject.curY = (e.touches) ? e.touches[0].pageY : e.clientY;
     touchObject.swipeLength = Math.round(Math.sqrt(Math.pow(touchObject.curX - touchObject.startX, 2)));
 
+    if (this.props.verticalSwiping) {
+      touchObject.swipeLength = Math.round(Math.sqrt(Math.pow(touchObject.curY - touchObject.startY, 2)));
+    }
+
     positionOffset = (this.props.rtl === false ? 1 : -1) * (touchObject.curX > touchObject.startX ? 1 : -1);
+
+    if (this.props.verticalSwiping) {
+      positionOffset = touchObject.curY > touchObject.startY ? 1 : -1;
+    }
 
     var currentSlide = this.state.currentSlide;
     var dotCount = Math.ceil(this.state.slideCount / this.props.slidesToScroll);
@@ -123,7 +131,16 @@ var EventHandlers = {
       this.setState({ swiped: true });
     }
 
-    swipeLeft = curLeft + touchSwipeLength * positionOffset;
+    if (!this.props.vertical) {
+      swipeLeft = curLeft + touchSwipeLength * positionOffset;
+    } else {
+      swipeLeft = curLeft + (touchSwipeLength * (this.state.listHeight / this.state.listWidth)) * positionOffset;
+    }
+
+    if (this.props.verticalSwiping) {
+      swipeLeft = curLeft + touchSwipeLength * positionOffset;
+    }
+
     this.setState({
       touchObject: touchObject,
       swipeLeft: swipeLeft,
@@ -145,6 +162,10 @@ var EventHandlers = {
     var minSwipe = this.state.listWidth/this.props.touchThreshold;
     var swipeDirection = this.swipeDirection(touchObject);
 
+    if (this.props.verticalSwiping) {
+      minSwipe = this.state.listHeight/this.props.touchThreshold;
+    }
+
     // reset the state of touch related state variables.
     this.setState({
       dragging: false,
@@ -159,12 +180,19 @@ var EventHandlers = {
     }
     if (touchObject.swipeLength > minSwipe) {
       e.preventDefault();
-      if (swipeDirection === 'left') {
-        this.slideHandler(this.state.currentSlide + this.props.slidesToScroll);
-      } else if (swipeDirection === 'right') {
-        this.slideHandler(this.state.currentSlide - this.props.slidesToScroll);
-      } else {
-        this.slideHandler(this.state.currentSlide);
+
+      switch (swipeDirection) {
+        case 'left':
+        case 'down':
+          this.slideHandler(this.state.currentSlide + this.props.slidesToScroll);
+          break;
+
+        case 'right':
+        case 'up':
+          this.slideHandler(this.state.currentSlide - this.props.slidesToScroll);
+          break;
+
+        default:
       }
     } else {
       // Adjust the track back to it's original position.

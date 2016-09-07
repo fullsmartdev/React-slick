@@ -7,19 +7,32 @@ import assign from 'object-assign';
 
 var helpers = {
   initialize: function (props) {
+    const slickList = ReactDOM.findDOMNode(this.list);
+
     var slideCount = React.Children.count(props.children);
-    var listWidth = this.getWidth(ReactDOM.findDOMNode(this.list));
+    var listWidth = this.getWidth(slickList);
     var trackWidth = this.getWidth(ReactDOM.findDOMNode(this.track));
-    var slideWidth = trackWidth/props.slidesToShow;
+    var slideWidth;
+
+    if (!props.vertical) {
+      slideWidth = trackWidth/props.slidesToShow;
+    } else {
+      slideWidth = trackWidth;
+    }
+
+    const slideHeight = this.getHeight(slickList.querySelector('[data-index="0"]'));
+    const listHeight = slideHeight * props.slidesToShow;
 
     var currentSlide = props.rtl ? slideCount - 1 - props.initialSlide : props.initialSlide;
 
     this.setState({
-      slideCount: slideCount,
-      slideWidth: slideWidth,
-      listWidth: listWidth,
-      trackWidth: trackWidth,
-      currentSlide: currentSlide
+      slideCount,
+      slideWidth,
+      listWidth,
+      trackWidth,
+      currentSlide,
+      slideHeight,
+      listHeight,
     }, function () {
 
       var targetLeft = getTrackLeft(assign({
@@ -35,22 +48,34 @@ var helpers = {
     });
   },
   update: function (props) {
+    const slickList = ReactDOM.findDOMNode(this.list);
     // This method has mostly same code as initialize method.
     // Refactor it
     var slideCount = React.Children.count(props.children);
-    var listWidth = this.getWidth(ReactDOM.findDOMNode(this.list));
+    var listWidth = this.getWidth(slickList);
     var trackWidth = this.getWidth(ReactDOM.findDOMNode(this.track));
-    var slideWidth = this.getWidth(ReactDOM.findDOMNode(this))/props.slidesToShow;
+    var slideWidth;
+
+    if (!props.vertical) {
+      slideWidth = trackWidth/props.slidesToShow;
+    } else {
+      slideWidth = trackWidth;
+    }
+
+    const slideHeight = this.getHeight(slickList.querySelector('[data-index="0"]'));
+    const listHeight = slideHeight * props.slidesToShow;
 
     // pause slider if autoplay is set to false
     if(!props.autoplay)
       this.pause();
 
     this.setState({
-      slideCount: slideCount,
-      slideWidth: slideWidth,
-      listWidth: listWidth,
-      trackWidth: trackWidth
+      slideCount,
+      slideWidth,
+      listWidth,
+      trackWidth,
+      slideHeight,
+      listHeight,
     }, function () {
 
       var targetLeft = getTrackLeft(assign({
@@ -65,6 +90,9 @@ var helpers = {
   },
   getWidth: function getWidth(elem) {
     return elem.getBoundingClientRect().width || elem.offsetWidth;
+  },
+  getHeight(elem) {
+    return elem.getBoundingClientRect().height || elem.offsetHeight;
   },
   adaptHeight: function () {
     if (this.props.adaptiveHeight) {
@@ -251,6 +279,13 @@ var helpers = {
     }
     if ((swipeAngle >= 135) && (swipeAngle <= 225)) {
         return (this.props.rtl === false ? 'right' : 'left');
+    }
+    if (this.props.verticalSwiping === true) {
+      if ((swipeAngle >= 35) && (swipeAngle <= 135)) {
+        return 'down';
+      } else {
+        return 'up';
+      }
     }
 
     return 'vertical';
