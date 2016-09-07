@@ -1,6 +1,5 @@
 'use strict';
 import ReactDOM from 'react-dom';
-import assign from 'object-assign';
 
 var checkSpecKeys = function (spec, keysArray) {
   return keysArray.reduce((value, key) => {
@@ -13,46 +12,29 @@ export var getTrackCSS = function(spec) {
     'left', 'variableWidth', 'slideCount', 'slidesToShow', 'slideWidth'
   ]);
 
-  var trackWidth, trackHeight;
+  var trackWidth;
 
-  const trackChildren = (spec.slideCount + 2 * spec.slidesToShow);
-
-  if (!spec.vertical) {
-    if (spec.variableWidth) {
-      trackWidth = (spec.slideCount + 2*spec.slidesToShow) * spec.slideWidth;
-    } else if (spec.centerMode) {
-      trackWidth = (spec.slideCount + 2*(spec.slidesToShow + 1)) * spec.slideWidth;
-    } else {
-      trackWidth = (spec.slideCount + 2*spec.slidesToShow) * spec.slideWidth;
-    }
+  if (spec.variableWidth) {
+    trackWidth = (spec.slideCount + 2*spec.slidesToShow) * spec.slideWidth;
+  } else if (spec.centerMode) {
+    trackWidth = (spec.slideCount + 2*(spec.slidesToShow + 1)) * spec.slideWidth;
   } else {
-    trackHeight = trackChildren * spec.slideHeight;
+    trackWidth = (spec.slideCount + 2*spec.slidesToShow) * spec.slideWidth;
   }
 
   var style = {
     opacity: 1,
-    WebkitTransform: !spec.vertical ? 'translate3d(' + spec.left + 'px, 0px, 0px)' : 'translate3d(0px, ' + spec.left + 'px, 0px)',
-    transform: !spec.vertical ? 'translate3d(' + spec.left + 'px, 0px, 0px)' : 'translate3d(0px, ' + spec.left + 'px, 0px)',
+    width: trackWidth,
+    WebkitTransform: 'translate3d(' + spec.left + 'px, 0px, 0px)',
+    transform: 'translate3d(' + spec.left + 'px, 0px, 0px)',
     transition: '',
     WebkitTransition: '',
-    msTransform: !spec.vertical ? 'translateX(' + spec.left + 'px)' : 'translateY(' + spec.left + 'px)',
+    msTransform: 'translateX(' + spec.left + 'px)'
   };
-
-  if (trackWidth) {
-    assign(style, { width: trackWidth });
-  }
-
-  if (trackHeight) {
-    assign(style, { height: trackHeight });
-  }
 
   // Fallback for IE8
   if (window && !window.addEventListener && window.attachEvent) {
-    if (!spec.vertical) {
-      style.marginLeft = spec.left + 'px';
-    } else {
-      style.marginTop = spec.left + 'px';
-    }
+    style.marginLeft = spec.left + 'px';
   }
 
   return style;
@@ -74,12 +56,11 @@ export var getTrackLeft = function (spec) {
 
   checkSpecKeys(spec, [
    'slideIndex', 'trackRef', 'infinite', 'centerMode', 'slideCount', 'slidesToShow',
-   'slidesToScroll', 'slideWidth', 'listWidth', 'variableWidth', 'slideHeight']);
+   'slidesToScroll', 'slideWidth', 'listWidth', 'variableWidth']);
 
   var slideOffset = 0;
   var targetLeft;
   var targetSlide;
-  var verticalOffset = 0;
 
   if (spec.fade) {
     return 0;
@@ -87,17 +68,14 @@ export var getTrackLeft = function (spec) {
 
   if (spec.infinite) {
     if (spec.slideCount > spec.slidesToShow) {
-      slideOffset = (spec.slideWidth * spec.slidesToShow) * -1;
-      verticalOffset = (spec.slideHeight * spec.slidesToShow) * -1;
+     slideOffset = (spec.slideWidth * spec.slidesToShow) * -1;
     }
     if (spec.slideCount % spec.slidesToScroll !== 0) {
       if (spec.slideIndex + spec.slidesToScroll > spec.slideCount && spec.slideCount > spec.slidesToShow) {
           if(spec.slideIndex > spec.slideCount) {
             slideOffset = ((spec.slidesToShow - (spec.slideIndex - spec.slideCount)) * spec.slideWidth) * -1;
-            verticalOffset = ((spec.slidesToShow - (spec.slideIndex - spec.slideCount)) * spec.slideHeight) * -1;
           } else {
             slideOffset = ((spec.slideCount % spec.slidesToScroll) * spec.slideWidth) * -1;
-            verticalOffset = ((spec.slideCount % spec.slidesToScroll) * spec.slideHeight) * -1;
           }
       }
     }
@@ -121,11 +99,7 @@ export var getTrackLeft = function (spec) {
     }
   }
 
-  if (!spec.vertical) {
-    targetLeft = ((spec.slideIndex * spec.slideWidth) * -1) + slideOffset;
-  } else {
-    targetLeft = ((spec.slideIndex * spec.slideHeight) * -1) + verticalOffset;
-  }
+  targetLeft = ((spec.slideIndex * spec.slideWidth) * -1) + slideOffset;
 
   if (spec.variableWidth === true) {
       var targetSlideIndex;

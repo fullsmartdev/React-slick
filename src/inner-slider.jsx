@@ -6,7 +6,6 @@ import HelpersMixin from './mixins/helpers';
 import initialState from './initial-state';
 import defaultProps from './default-props';
 import classnames from 'classnames';
-import assign from 'object-assign';
 
 import {Track} from './track';
 import {Dots} from './dots';
@@ -123,9 +122,7 @@ export var InnerSlider = React.createClass({
     });
   },
   render: function () {
-    var className = classnames('slick-initialized', 'slick-slider', this.props.className, {
-      'slick-vertical': this.props.vertical,
-    });
+    var className = classnames('slick-initialized', 'slick-slider', this.props.className);
 
     var trackProps = {
       fade: this.props.fade,
@@ -133,7 +130,7 @@ export var InnerSlider = React.createClass({
       speed: this.props.speed,
       infinite: this.props.infinite,
       centerMode: this.props.centerMode,
-      focusOnSelect: this.props.focusOnSelect ? this.selectHandler : new Function(),
+      focusOnSelect: this.props.focusOnSelect ? this.selectHandler : null,
       currentSlide: this.state.currentSlide,
       lazyLoad: this.props.lazyLoad,
       lazyLoadedList: this.state.lazyLoadedList,
@@ -179,14 +176,6 @@ export var InnerSlider = React.createClass({
       nextArrow = (<NextArrow {...arrowProps} />);
     }
 
-    var verticalHeightStyle = null;
-
-    if (this.props.vertical) {
-      verticalHeightStyle = {
-        height: this.state.listHeight,
-      };
-    }
-
     var centerPaddingStyle = null;
 
     if (this.props.vertical === false) {
@@ -203,15 +192,13 @@ export var InnerSlider = React.createClass({
       }
     }
 
-    const listStyle = assign({}, verticalHeightStyle, centerPaddingStyle);
-
     return (
       <div className={className} onMouseEnter={this.onInnerSliderEnter} onMouseLeave={this.onInnerSliderLeave}>
         {prevArrow}
         <div
           ref={this.listRefHandler}
           className="slick-list"
-          style={listStyle}
+          style={centerPaddingStyle}
           onMouseDown={this.swipeStart}
           onMouseMove={this.state.dragging ? this.swipeMove: null}
           onMouseUp={this.swipeEnd}
