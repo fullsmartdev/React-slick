@@ -104,12 +104,12 @@ var SimpleSlider = React.createClass({
 | slidesToScroll | int | Number of slides to scroll for each navigation item
 | speed | int |||
 | swipe | bool |||
-| swipeToSlide | bool | Allow users to drag or swipe directly to a slide irrespective of slidesToScroll | Yes |
+| swipeToSlide | bool |||
 | touchMove | bool |||
 | touchThreshold | int |||
 | variableWidth | bool |||
 | useCSS | bool | Enable/Disable CSS Transitions | Yes |
-| vertical | bool | Vertical slide mode | Yes |
+| vertical | bool |||
 | afterChange | function | callback function called after the current index changes | Yes |
 | beforeChange | function | callback function called before the current index changes | Yes |
 | slickGoTo | int | go to the specified slide number | |
@@ -138,6 +138,14 @@ like the example above. If you don't, your custom component won't trigger the cl
 
 You can also set onClick={this.props.onClick} if you only want to set the click handler. 
 
+### Flexbox support 
+If you have flex property on container div of slider, add below css
+```
+* {
+  min-height: 0;
+  min-width: 0;
+}
+```
 
 ### Development
 Want to run demos locally
