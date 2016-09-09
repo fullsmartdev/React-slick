@@ -15,9 +15,9 @@ var helpers = {
     var slideWidth;
 
     if (!props.vertical) {
-      slideWidth = this.getWidth(ReactDOM.findDOMNode(this))/props.slidesToShow;
+      slideWidth = trackWidth/props.slidesToShow;
     } else {
-      slideWidth = this.getWidth(ReactDOM.findDOMNode(this));
+      slideWidth = trackWidth;
     }
 
     const slideHeight = this.getHeight(slickList.querySelector('[data-index="0"]'));
@@ -57,9 +57,9 @@ var helpers = {
     var slideWidth;
 
     if (!props.vertical) {
-      slideWidth = this.getWidth(ReactDOM.findDOMNode(this))/props.slidesToShow;
+      slideWidth = trackWidth/props.slidesToShow;
     } else {
-      slideWidth = this.getWidth(ReactDOM.findDOMNode(this));
+      slideWidth = trackWidth;
     }
 
     const slideHeight = this.getHeight(slickList.querySelector('[data-index="0"]'));
