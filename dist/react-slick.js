@@ -425,16 +425,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    var centerPaddingStyle = null;
-	    var sidePaddingStyle = null;
 
 	    if (this.props.vertical === false) {
 	      if (this.props.centerMode === true) {
 	        centerPaddingStyle = {
 	          padding: '0px ' + this.props.centerPadding
-	        };
-	      } else if (this.props.sidePadding) {
-	        sidePaddingStyle = {
-	          paddingRight: parseInt(this.props.sidePadding)
 	        };
 	      }
 	    } else {
@@ -445,7 +440,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 
-	    var listStyle = (0, _objectAssign2.default)({}, verticalHeightStyle, centerPaddingStyle, sidePaddingStyle);
+	    var listStyle = (0, _objectAssign2.default)({}, verticalHeightStyle, centerPaddingStyle);
 
 	    return _react2.default.createElement(
 	      'div',
@@ -591,9 +586,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    if (this.state.animating) {
 	      return;
-	    }
-	    if (this.props.vertical && this.props.swipeToSlide && this.props.verticalSwiping) {
-	      e.preventDefault();
 	    }
 	    var swipeLeft;
 	    var curLeft, positionOffset;
