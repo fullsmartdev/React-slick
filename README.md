@@ -80,8 +80,8 @@ var SimpleSlider = React.createClass({
 | className      | String |Additional class name for the inner slider div | Yes |
 | adaptiveHeight | bool | Adjust the slide's height automatically | Yes |
 | arrows         | bool | Should we show Left and right nav arrows | Yes |
-| nextArrow      | React Component | Use this component for the next arrow button | Yes |
-| prevArrow      | React Component | Use this component for the prev arrow button | Yes |
+| nextArrow      | React Element | Use this element for the next arrow button | Yes |
+| prevArrow      | React Element | Use this element for the prev arrow button | Yes |
 | autoplay       | bool | Should the scroller auto scroll? | Yes |
 | autoplaySpeed  |  int | delay between each auto scoll. in ms | Yes |
 | centerMode     | bool | Should we centre to a single item? | Yes |
@@ -117,9 +117,9 @@ var SimpleSlider = React.createClass({
 
 
 ### Methods
-* `slickNext()`   - function called to change current slide on next slide ([Example](https://github.com/akiran/react-slick/blob/master/examples/PreviousNextMethods.js))
-* `slickPrev()`   - function called to change current slide on previous slide ([Example](https://github.com/akiran/react-slick/blob/master/examples/PreviousNextMethods.js))
-* `slickGoTo(slideNumber)` - function called to change current slide to given slide number ([Example](https://github.com/akiran/react-slick/blob/master/examples/SlickGoTo.js))
+* slickNext()   - function called to change current slide on next slide ([Example](https://github.com/akiran/react-slick/blob/master/examples/PreviousNextMethods.js))
+* slickPrev()   - function called to change current slide on previous slide ([Example](https://github.com/akiran/react-slick/blob/master/examples/PreviousNextMethods.js))
+* slickGoTo(slideNumber) - function called to change current slide to given slide number ([Example](https://github.com/akiran/react-slick/blob/master/examples/SlickGoTo.js))
 
 ### Custom next/prev arrows
 
@@ -137,11 +137,11 @@ class LeftNavButton extends React.Component {
 Important: be sure that you pass your component's props to your clickable element
 like the example above. If you don't, your custom component won't trigger the click handler.
 
-You can also set `onClick={this.props.onClick}` if you only want to set the click handler.
+You can also set onClick={this.props.onClick} if you only want to set the click handler.
 
 ### Flexbox support
 If you have flex property on container div of slider, add below css
-```css
+```
 * {
   min-height: 0;
   min-width: 0;
@@ -155,7 +155,7 @@ matchMedia not present, legacy browsers require a polyfill
 ```
 
 To fix this issue add below snippet in test-setup.js
-```js
+```
 window.matchMedia = window.matchMedia || function() {
     return {
         matches : false,
@@ -166,7 +166,7 @@ window.matchMedia = window.matchMedia || function() {
 
 ```
 and add below jest config in package.json
-```json
+```
 "jest": {
     "setupFiles": ["test-setup.js"]
 }
@@ -176,7 +176,7 @@ and add below jest config in package.json
 ### Development
 Want to run demos locally
 
-```bash
+```shell
 git clone https://github.com/akiran/react-slick
 npm install
 npm start
