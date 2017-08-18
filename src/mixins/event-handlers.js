@@ -87,7 +87,6 @@ var EventHandlers = {
       return;
     }
     if (this.state.animating) {
-      e.preventDefault();
       return;
     }
     if (this.props.vertical && this.props.swipeToSlide && this.props.verticalSwiping) {
