@@ -21,32 +21,27 @@ export default class Slider extends React.Component {
     this.innerSlider = ref;
   }
   media(query, handler) {
-    // javascript handler for  css media query
     enquire.register(query, handler);
     this._responsiveMediaHandlers.push({query, handler});
   }
   componentWillMount() {
     if (this.props.responsive) {
       var breakpoints = this.props.responsive.map(breakpt => breakpt.breakpoint);
-      // sort them in increasing order of their numerical value
       breakpoints.sort((x, y) => x - y);
 
       breakpoints.forEach((breakpoint, index) => {
-        // media query for each breakpoint
         var bQuery;
         if (index === 0) {
           bQuery = json2mq({minWidth: 0, maxWidth: breakpoint});
         } else {
           bQuery = json2mq({minWidth: breakpoints[index-1], maxWidth: breakpoint});
         }
-        // when not using server side rendering
         canUseDOM && this.media(bQuery, () => {
           this.setState({breakpoint: breakpoint});
         })
       });
 
       // Register media query for full screen. Need to support resize from small to large
-      // convert javascript object to media query string
       var query = json2mq({minWidth: breakpoints.slice(-1)[0]});
 
       canUseDOM && this.media(query, () => {
@@ -73,14 +68,6 @@ export default class Slider extends React.Component {
     this.innerSlider.slickGoTo(slide)
   }
 
-  slickPause(){
-    this.innerSlider.pause()
-  }
-
-  slickPlay(){
-    this.innerSlider.autoPlay()
-  }
-
   render() {
     var settings;
     var newProps;
@@ -91,18 +78,15 @@ export default class Slider extends React.Component {
       settings = assign({}, defaultProps, this.props);
     }
 
-    // always scroll by one if centerMode is on
-    if(settings.centerMode){
-      settings.slidesToScroll = 1
-    }
-
     var children = this.props.children;
     if(!Array.isArray(children)) {
       children = [children]
     }
 
     // Children may contain false or null, so we should filter them
-    children = children.filter(child => !!child)
+    children = children.filter(function(child){
+      return !!child
+    })
 
     if (settings === 'unslick') {
       // if 'unslick' responsive breakpoint setting used, just return the <Slider> tag nested HTML
