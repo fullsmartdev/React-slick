@@ -15,10 +15,17 @@ export var getTrackCSS = function(spec) {
   ]);
 
   var trackWidth, trackHeight;
-  const trackChildren = (spec.slideCount + 2 * spec.slidesToShow); // this should probably be getTotalSlides
+
+  const trackChildren = (spec.slideCount + 2 * spec.slidesToShow);
+
   if (!spec.vertical) {
-    trackWidth = getTotalSlides(spec) * spec.slideWidth;
-    trackWidth += spec.slideWidth/2 // this is a temporary hack so that track div doesn't create new row for slight overflow
+    if (spec.variableWidth) {
+      trackWidth = (spec.slideCount + 2*spec.slidesToShow) * spec.slideWidth;
+    } else if (spec.centerMode) {
+      trackWidth = (spec.slideCount + 2*(spec.slidesToShow + 1)) * spec.slideWidth;
+    } else {
+      trackWidth = (spec.slideCount + 2*spec.slidesToShow) * spec.slideWidth;
+    }
   } else {
     trackHeight = trackChildren * spec.slideHeight;
   }
@@ -69,78 +76,79 @@ export var getTrackLeft = function (spec) {
   checkSpecKeys(spec, [
    'slideIndex', 'trackRef', 'infinite', 'centerMode', 'slideCount', 'slidesToShow',
    'slidesToScroll', 'slideWidth', 'listWidth', 'variableWidth', 'slideHeight']);
-  
-  const {slideIndex, trackRef, infinite, centerMode, slideCount, slidesToShow,
-    slidesToScroll, slideWidth, listWidth, variableWidth, slideHeight, fade, vertical} = spec
 
   var slideOffset = 0;
   var targetLeft;
   var targetSlide;
   var verticalOffset = 0;
 
-  if (fade) {
+  if (spec.fade) {
     return 0;
   }
 
-  let slidesToOffset = 0
-  if(infinite){
-    slidesToOffset = -getPreClones(spec) // bring active slide to the beginning of visual area
-    if (slideCount % slidesToScroll !== 0 && (slideIndex + slidesToScroll) > slideCount){
-      slidesToOffset = -(slideIndex > slideCount ? (slidesToShow - (slideIndex - slideCount)) : slideCount % slidesToScroll)
+  if (spec.infinite) {
+    if (spec.slideCount >= spec.slidesToShow) {
+      slideOffset = (spec.slideWidth * spec.slidesToShow) * -1;
+      verticalOffset = (spec.slideHeight * spec.slidesToShow) * -1;
     }
-    if(centerMode){
-      slidesToOffset += parseInt(slidesToShow / 2)
+    if (spec.slideCount % spec.slidesToScroll !== 0) {
+      if (spec.slideIndex + spec.slidesToScroll > spec.slideCount && spec.slideCount > spec.slidesToShow) {
+          if(spec.slideIndex > spec.slideCount) {
+            slideOffset = ((spec.slidesToShow - (spec.slideIndex - spec.slideCount)) * spec.slideWidth) * -1;
+            verticalOffset = ((spec.slidesToShow - (spec.slideIndex - spec.slideCount)) * spec.slideHeight) * -1;
+          } else {
+            slideOffset = ((spec.slideCount % spec.slidesToScroll) * spec.slideWidth) * -1;
+            verticalOffset = ((spec.slideCount % spec.slidesToScroll) * spec.slideHeight) * -1;
+          }
+      }
     }
   } else {
-    if(slideCount % slidesToScroll !== 0 && slideIndex + slidesToScroll > slideCount){
-      slidesToOffset = slidesToShow - (slideCount % slidesToScroll)
-    }
-    if(centerMode){
-      slidesToOffset = parseInt(slidesToShow / 2)
+
+    if (spec.slideCount % spec.slidesToScroll !== 0) {
+      if (spec.slideIndex + spec.slidesToScroll > spec.slideCount && spec.slideCount > spec.slidesToShow) {
+          var slidesToOffset = spec.slidesToShow - (spec.slideCount % spec.slidesToScroll);
+          slideOffset = slidesToOffset * spec.slideWidth;
+      }
     }
   }
-  slideOffset = slidesToOffset * slideWidth
-  verticalOffset = slidesToOffset * slideHeight
 
-  if (!vertical) {
-    targetLeft = ((slideIndex * slideWidth) * -1) + slideOffset;
+
+
+  if (spec.centerMode) {
+    if(spec.infinite) {
+      slideOffset += spec.slideWidth * Math.floor(spec.slidesToShow / 2);
+    } else {
+      slideOffset = spec.slideWidth * Math.floor(spec.slidesToShow / 2);
+    }
+  }
+
+  if (!spec.vertical) {
+    targetLeft = ((spec.slideIndex * spec.slideWidth) * -1) + slideOffset;
   } else {
-    targetLeft = ((slideIndex * slideHeight) * -1) + verticalOffset;
+    targetLeft = ((spec.slideIndex * spec.slideHeight) * -1) + verticalOffset;
   }
 
-  if (variableWidth === true) {
+  if (spec.variableWidth === true) {
       var targetSlideIndex;
-      if(slideCount <= slidesToShow || infinite === false) {
-          targetSlide = ReactDOM.findDOMNode(trackRef).childNodes[slideIndex];
+      if(spec.slideCount <= spec.slidesToShow || spec.infinite === false) {
+          targetSlide = ReactDOM.findDOMNode(spec.trackRef).childNodes[spec.slideIndex];
       } else {
-          targetSlideIndex = (slideIndex + slidesToShow);
-          targetSlide = ReactDOM.findDOMNode(trackRef).childNodes[targetSlideIndex];
+          targetSlideIndex = (spec.slideIndex + spec.slidesToShow);
+          targetSlide = ReactDOM.findDOMNode(spec.trackRef).childNodes[targetSlideIndex];
       }
       targetLeft = targetSlide ? targetSlide.offsetLeft * -1 : 0;
-      if (centerMode === true) {
-          if(infinite === false) {
-              targetSlide = ReactDOM.findDOMNode(trackRef).children[slideIndex];
+      if (spec.centerMode === true) {
+          if(spec.infinite === false) {
+              targetSlide = ReactDOM.findDOMNode(spec.trackRef).children[spec.slideIndex];
           } else {
-              targetSlide = ReactDOM.findDOMNode(trackRef).children[(slideIndex + slidesToShow + 1)];
+              targetSlide = ReactDOM.findDOMNode(spec.trackRef).children[(spec.slideIndex + spec.slidesToShow + 1)];
           }
 
           if (targetSlide) {
-            targetLeft = targetSlide.offsetLeft * -1 + (listWidth - targetSlide.offsetWidth) / 2;
+            targetLeft = targetSlide.offsetLeft * -1 + (spec.listWidth - targetSlide.offsetWidth) / 2;
           }
       }
   }
 
   return targetLeft;
 };
-
-export function getPreClones(spec){
-  return spec.slidesToShow + (spec.centerMode ? 1: 0)
-}
-
-export function getPostClones(spec){
-  return spec.slideCount
-}
-
-export function getTotalSlides(spec){
-  return getPreClones(spec) + spec.slideCount + getPostClones(spec)
-}
