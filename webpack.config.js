@@ -1,6 +1,6 @@
 var webpack = require('webpack');
 var path = require('path');
-var autoprefixer = require('autoprefixer');
+var autoprefixer = require('autoprefixer-core');
 
 module.exports = {
   devtool: '#inline-source-map',

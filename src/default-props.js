@@ -41,12 +41,11 @@ var defaultProps = {
     afterChange: null,
     beforeChange: null,
     edgeEvent: null,
-    // init: function hook that gets called right before InnerSlider mounts
-    init: null, 
+    init: null,
     swipeEvent: null,
-    // nextArrow, prevArrow should react componets
+    // nextArrow, prevArrow are react componets
     nextArrow: null,
     prevArrow: null
 };
 
-export default defaultProps
+module.exports = defaultProps;
