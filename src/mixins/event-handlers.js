@@ -148,12 +148,7 @@ var EventHandlers = {
     }
 
     if (!this.props.vertical) {
-      if (!this.props.rtl) {
-        swipeLeft = curLeft + touchSwipeLength * positionOffset;
-      }
-      else {
-        swipeLeft = curLeft - touchSwipeLength * positionOffset;
-      }
+      swipeLeft = curLeft + touchSwipeLength * positionOffset;
     } else {
       swipeLeft = curLeft + (touchSwipeLength * (this.state.listHeight / this.state.listWidth)) * positionOffset;
     }
@@ -246,8 +241,7 @@ var EventHandlers = {
         return true;
       });
 
-      const currentIndex = this.props.rtl === true ? this.state.slideCount - this.state.currentSlide : this.state.currentSlide; 
-      const slidesTraversed = Math.abs(swipedSlide.dataset.index - currentIndex) || 1;
+      const slidesTraversed = Math.abs(swipedSlide.dataset.index - this.state.currentSlide) || 1;
 
       return slidesTraversed;
     } else {
