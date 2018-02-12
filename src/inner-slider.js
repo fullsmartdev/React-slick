@@ -197,8 +197,7 @@ export var InnerSlider = createReactClass({
         clickHandler: this.changeSlide,
         children: this.props.children,
         customPaging: this.props.customPaging,
-        infinite: this.props.infinite,
-        renderDots: this.props.renderDots
+        infinite: this.props.infinite
       };
 
       dots = (<Dots {...dotProps} />);
