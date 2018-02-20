@@ -53,7 +53,7 @@ get started with react-slick.
 
 ```js
 var React = require('react');
-var Slider = require('react-slick');
+import Slider from 'react-slick';
 
 class SimpleSlider extends React.Component {
   render: function () {
@@ -96,7 +96,6 @@ Props            | Type            | Default Value                   | Descripti
 `customPaging`   | `func`          | `i => <button>{i + 1}</button>` | Custom paging templates. [Example](examples/CustomPaging.js)            | Yes
 `dots`           | `bool`          | `Default`                       |                                                             | Yes
 `dotsClass`      | `string`        | `'slick-dots'`                  | CSS class for dots                                          | Yes
-`appendDots`     | `func`          | `dots => <ul>{dots}</ul>`       | Custom dots templates. Works same as customPaging           | Yes
 `draggable`      | `bool`          | `true`                          | Enable scrollable via dragging on desktop                   | Yes
 `easing`         | `string`        | `'linear'`                      |                                                             |
 `fade`           | `bool`          | `Default`                       |                                                             | Yes
