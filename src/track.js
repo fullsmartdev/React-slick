@@ -3,7 +3,6 @@
 import React from 'react';
 import assign from 'object-assign';
 import classnames from 'classnames';
-import { getPreClones } from './utils/trackUtils';
 
 
 // given specifications/props for a slide, fetch all the classes that need to be applied to the slide
@@ -109,7 +108,7 @@ var renderSlides = function (spec) {
     // if slide needs to be precloned or postcloned
     if (spec.infinite && spec.fade === false) {
       let preCloneNo = childrenCount - index
-      if (preCloneNo <= getPreClones(spec)
+      if (preCloneNo <= spec.slidesToShow + (spec.centerMode ? 1 : 0)
         && childrenCount !== spec.slidesToShow){
         key = -preCloneNo;
         preCloneSlides.push(React.cloneElement(child, {
