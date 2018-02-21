@@ -12,7 +12,6 @@ import UnevenSetsFinite from '../examples/UnevenSetsFinite'
 import CenterMode from '../examples/CenterMode'
 import FocusOnSelect from '../examples/FocusOnSelect'
 import AutoPlay from '../examples/AutoPlay'
-import AutoPlayMethods from '../examples/AutoPlayMethods'
 import PauseOnHover from '../examples/PauseOnHover'
 import Rtl from '../examples/Rtl'
 import VariableWidth from '../examples/VariableWidth'
@@ -41,7 +40,6 @@ export default class App extends React.Component {
         <CenterMode />
         <FocusOnSelect />
         <AutoPlay />
-        <AutoPlayMethods />
         <PauseOnHover />
         <Rtl />
         <VariableWidth />
