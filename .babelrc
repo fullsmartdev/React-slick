@@ -3,9 +3,5 @@
     "react",
     ["es2015", {"loose": true}]
   ],
-  "plugins": [
-    "transform-object-assign", 
-    "transform-object-rest-spread",
-    "transform-class-properties"
-  ]
+  "plugins": ["transform-object-assign", "transform-object-rest-spread"]
 }
