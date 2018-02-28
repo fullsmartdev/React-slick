@@ -83,7 +83,7 @@ var renderSlides = function (spec) {
     if (!spec.lazyLoad || (spec.lazyLoad && spec.lazyLoadedList.indexOf(index) >= 0)) {
       child = elem;
     } else {
-      child = (<div></div>);
+      child = <div />
     }
     var childStyle = getSlideStyle(assign({}, spec, {index: index}));
     const slideClass = child.props.className || ''
@@ -115,6 +115,7 @@ var renderSlides = function (spec) {
         preCloneSlides.push(React.cloneElement(child, {
           key: 'precloned' + getKey(child, key),
           'data-index': key,
+          tabIndex: '-1',
           className: classnames(getSlideClasses(assign({index: key}, spec)), slideClass),
           style: assign({}, child.props.style || {}, childStyle),
           onClick
@@ -126,6 +127,7 @@ var renderSlides = function (spec) {
         postCloneSlides.push(React.cloneElement(child, {
           key: 'postcloned' + getKey(child, key),
           'data-index': key,
+          tabIndex: '-1',
           className: classnames(getSlideClasses(assign({index: key}, spec)), slideClass),
           style: assign({}, child.props.style || {}, childStyle),
           onClick

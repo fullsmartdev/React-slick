@@ -90,10 +90,15 @@ var helpers = {
       startIndex = this.state.currentSlide
       endIndex = this.state.currentSlide + props.slidesToShow
     }
+    let notLoaded = []
     for (let slideIndex = startIndex; slideIndex < endIndex; slideIndex += 1) {
       if (lazyLoadedList.indexOf(slideIndex) < 0) {
         lazyLoadedList.push(slideIndex)
+        notLoaded.push(slideIndex)
       }
+    }
+    if (this.props.lazyLoaded && notLoaded.length > 0) {
+      this.props.lazyLoaded(notLoaded)
     }
 
     this.setState({
@@ -152,7 +157,6 @@ var helpers = {
   },
   slideHandler: function (index) {
     // index is target slide index
-
     // Functionality of animateSlide and postSlide is merged into this function
     var animationTargetSlide, finalTargetSlide;
     var animationTargetLeft, finalTargetLeft;
@@ -184,6 +188,9 @@ var helpers = {
         this.setState({
           lazyLoadedList: this.state.lazyLoadedList.concat(animationTargetSlide)
         });
+        if (this.props.lazyLoaded) {
+          this.props.lazyLoaded([animationTargetSlide])
+        }
       }
 
       callback = () => {
@@ -204,6 +211,9 @@ var helpers = {
         animating: true,
         currentSlide: animationTargetSlide
       }, function () {
+        if (this.props.asNavFor && this.props.asNavFor.innerSlider.state.currentSlide !== this.state.currentSlide) {
+          this.props.asNavFor.innerSlider.slideHandler(index)
+        }
         this.animationEndCallback = setTimeout(callback, this.props.speed);
       });
 
@@ -303,6 +313,9 @@ var helpers = {
         this.setState({
           lazyLoadedList: this.state.lazyLoadedList.concat(slidesToLoad)
         });
+        if (this.props.lazyLoaded) {
+          this.props.lazyLoaded(slidesToLoad)
+        }
       }
     }
 
@@ -343,6 +356,9 @@ var helpers = {
         currentSlide: finalTargetSlide,
         trackStyle: getTrackAnimateCSS(assign({left: animationTargetLeft}, this.props, this.state))
       }, function () {
+        if (this.props.asNavFor && this.props.asNavFor.innerSlider.state.currentSlide !== this.state.currentSlide) {
+          this.props.asNavFor.innerSlider.slideHandler(index)
+        }
         this.animationEndCallback = setTimeout(callback, this.props.speed);
       });
 
@@ -397,21 +413,17 @@ var helpers = {
     this.slideHandler(nextIndex);
   },
   autoPlay: function (autoplay=false) {
-    if (this.state.autoPlayTimer) {
-      clearTimeout(this.state.autoPlayTimer);
+    if (this.autoplayTimer) {
+      clearTimeout(this.autoplayTimer)
     }
     if (autoplay || this.props.autoplay) {
-      this.setState({
-        autoPlayTimer: setTimeout(this.play, this.props.autoplaySpeed)
-      });
+      this.autoplayTimer = setTimeout(this.play, this.props.autoplaySpeed)
     }
   },
   pause: function () {
-    if (this.state.autoPlayTimer) {
-      clearTimeout(this.state.autoPlayTimer);
-      this.setState({
-        autoPlayTimer: null
-      });
+    if (this.autoplayTimer) {
+      clearTimeout(this.autoplayTimer)
+      this.autoplayTimer = null
     }
   }
 };
