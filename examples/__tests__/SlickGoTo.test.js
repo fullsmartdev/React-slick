@@ -2,7 +2,7 @@ import React from 'react';
 import { mount } from 'enzyme';
 import SlickGoTo from '../SlickGoTo'
 
-describe.skip('SlickGoTo', () => {
+describe('SlickGoTo', () => {
   it('should goto 2nd slide', () => {
     const wrapper = mount(<SlickGoTo />)
     wrapper.find('input').simulate('change', { target: { value: 1 } })
