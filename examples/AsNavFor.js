@@ -17,14 +17,15 @@ export default class AsNavFor extends Component {
       nav2: this.slider2
     })
   }
-
+  
   render() {
     return (
       <div>
         <h2>Slider Syncing (AsNavFor)</h2>
         <h4>First Slider</h4>
-          <Slider asNavFor={this.state.nav2}
+          <Slider asNavFor={this.state.nav2} 
             ref={slider => this.slider1 = slider}
+            fade={true}
             >
             <div><h3>1</h3></div>
             <div><h3>2</h3></div>
@@ -34,11 +35,10 @@ export default class AsNavFor extends Component {
             <div><h3>6</h3></div>
           </Slider>
         <h4>Second Slider</h4>
-        <Slider asNavFor={this.state.nav1}
+        <Slider asNavFor={this.state.nav1} 
           ref={slider => this.slider2 = slider}
           slidesToShow={3}
-          swipeToSlide={true}
-          focusOnSelect={true}
+          centerMode={true}
         >
           <div><h3>1</h3></div>
           <div><h3>2</h3></div>
