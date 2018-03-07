@@ -9,7 +9,6 @@
   ],
   "scripts": {
     "start": "gulp server",
-    "build": "webpack",
     "prepublish": "babel ./src --out-dir ./lib && gulp dist",
     "test": "jest",
     "test:watch": "jest --watch",
