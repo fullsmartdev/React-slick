@@ -4,7 +4,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {getTrackCSS, getTrackLeft, getTrackAnimateCSS} from './trackHelper';
 import assign from 'object-assign';
-import { getOnDemandLazySlides } from '../utils/innerSliderUtils'
+import { getOnDemandLazySlides, getWidth, getHeight } from '../utils/innerSliderUtils'
 
 var helpers = {
   // supposed to start autoplay of slides
@@ -12,8 +12,8 @@ var helpers = {
     const slickList = ReactDOM.findDOMNode(this.list);
 
     var slideCount = React.Children.count(props.children);
-    var listWidth = this.getWidth(slickList);
-    var trackWidth = this.getWidth(ReactDOM.findDOMNode(this.track));
+    var listWidth = getWidth(slickList);
+    var trackWidth = getWidth(ReactDOM.findDOMNode(this.track));
     var slideWidth;
 
     if (!props.vertical) {
@@ -21,12 +21,12 @@ var helpers = {
       if (props.centerPadding.slice(-1) === '%') {
         centerPaddingAdj *= listWidth / 100
       }
-      slideWidth = Math.ceil((this.getWidth(ReactDOM.findDOMNode(this)) - centerPaddingAdj)/props.slidesToShow)
+      slideWidth = Math.ceil((getWidth(slickList) - centerPaddingAdj)/props.slidesToShow)
     } else {
-      slideWidth = Math.ceil(this.getWidth(ReactDOM.findDOMNode(this)))
+      slideWidth = Math.ceil(getWidth(slickList))
     }
 
-    const slideHeight = this.getHeight(slickList.querySelector('[data-index="0"]'));
+    const slideHeight = getHeight(slickList.querySelector('[data-index="0"]'));
     const listHeight = slideHeight * props.slidesToShow;
 
     var currentSlide = props.rtl ? slideCount - 1 - props.initialSlide : props.initialSlide;
@@ -53,13 +53,13 @@ var helpers = {
       this.autoPlay(); // once we're set up, trigger the initial autoplay.
     });
   },
-  update: function (props) {
+  update: function (props, recursionLevel=0) {
     const slickList = ReactDOM.findDOMNode(this.list);
     // This method has mostly same code as initialize method.
     // Refactor it
     var slideCount = React.Children.count(props.children);
-    var listWidth = this.getWidth(slickList);
-    var trackWidth = this.getWidth(ReactDOM.findDOMNode(this.track));
+    var listWidth = getWidth(slickList);
+    var trackWidth = getWidth(ReactDOM.findDOMNode(this.track));
     var slideWidth;
 
     if (!props.vertical) {
@@ -67,12 +67,12 @@ var helpers = {
       if (props.centerPadding.slice(-1) === '%') {
         centerPaddingAdj *= listWidth / 100
       }
-      slideWidth = Math.ceil((this.getWidth(ReactDOM.findDOMNode(this)) - centerPaddingAdj)/props.slidesToShow)
+      slideWidth = Math.ceil((getWidth(slickList) - centerPaddingAdj)/props.slidesToShow)
     } else {
-      slideWidth = Math.ceil(this.getWidth(ReactDOM.findDOMNode(this)))
+      slideWidth = Math.ceil(getWidth(slickList))
     }
 
-    const slideHeight = this.getHeight(slickList.querySelector('[data-index="0"]'));
+    const slideHeight = getHeight(slickList.querySelector('[data-index="0"]'));
     const listHeight = slideHeight * props.slidesToShow;
 
     // pause slider if autoplay is set to false
@@ -96,7 +96,11 @@ var helpers = {
       listHeight,
       lazyLoadedList: prevLazyLoadedList.concat(slidesToLoad)
     }, function () {
-
+      if (!slideWidth) {
+        if (recursionLevel < 2) {
+          this.update(this.props, recursionLevel + 1)
+        }
+      }
       var targetLeft = getTrackLeft(assign({
         slideIndex: this.state.currentSlide,
         trackRef: this.track
@@ -106,12 +110,6 @@ var helpers = {
 
       this.setState({trackStyle: trackStyle});
     });
-  },
-  getWidth: function getWidth(elem) {
-    return elem && (elem.getBoundingClientRect().width || elem.offsetWidth) || 0;
-  },
-  getHeight(elem) {
-    return elem && (elem.getBoundingClientRect().height || elem.offsetHeight) || 0;
   },
   adaptHeight: function () {
     if (this.props.adaptiveHeight) {
@@ -190,7 +188,7 @@ var helpers = {
       this.setState({
         animating: true,
         currentSlide: animationTargetSlide
-      }, function () {
+      }, () => {
         if (this.props.asNavFor && this.props.asNavFor.innerSlider.state.currentSlide !== this.state.currentSlide) {
           this.props.asNavFor.innerSlider.slideHandler(index)
         }
@@ -319,7 +317,7 @@ var helpers = {
         animating: true,
         currentSlide: finalTargetSlide,
         trackStyle: getTrackAnimateCSS(assign({left: animationTargetLeft}, this.props, this.state))
-      }, function () {
+      }, () => {
         if (this.props.asNavFor && this.props.asNavFor.innerSlider.state.currentSlide !== this.state.currentSlide) {
           this.props.asNavFor.innerSlider.slideHandler(index)
         }
@@ -329,33 +327,6 @@ var helpers = {
     }
 
     this.autoPlay();
-  },
-  swipeDirection: function (touchObject) {
-    var xDist, yDist, r, swipeAngle;
-
-    xDist = touchObject.startX - touchObject.curX;
-    yDist = touchObject.startY - touchObject.curY;
-    r = Math.atan2(yDist, xDist);
-
-    swipeAngle = Math.round(r * 180 / Math.PI);
-    if (swipeAngle < 0) {
-        swipeAngle = 360 - Math.abs(swipeAngle);
-    }
-    if ((swipeAngle <= 45) && (swipeAngle >= 0) || (swipeAngle <= 360) && (swipeAngle >= 315)) {
-        return 'left';
-    }
-    if ((swipeAngle >= 135) && (swipeAngle <= 225)) {
-        return 'right';
-    }
-    if (this.props.verticalSwiping === true) {
-      if ((swipeAngle >= 35) && (swipeAngle <= 135)) {
-        return 'down';
-      } else {
-        return 'up';
-      }
-    }
-
-    return 'vertical';
   },
   play: function(){
     var nextIndex;
