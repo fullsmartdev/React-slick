@@ -4,7 +4,6 @@ import helpers from './helpers';
 import assign from 'object-assign';
 import ReactDOM from 'react-dom';
 import { siblingDirection } from '../utils/trackUtils'
-import { getWidth, getHeight, getSwipeDirection } from '../utils/innerSliderUtils'
 
 var EventHandlers = {
   // Event handler for previous and next
@@ -79,9 +78,6 @@ var EventHandlers = {
   },
   // invoked when swiping/dragging starts (just once)
   swipeStart: function (e) {
-    if (e.target.tagName === 'IMG') {
-      e.preventDefault()
-    }
     var touches, posX, posY;
 
     // the condition after or looked redundant
@@ -150,7 +146,7 @@ var EventHandlers = {
 
     var currentSlide = this.state.currentSlide;
     var dotCount = Math.ceil(this.state.slideCount / this.props.slidesToScroll); // this might not be correct, using getDotCount may be more accurate
-    var swipeDirection = getSwipeDirection(this.state.touchObject, this.props.verticalSwiping);
+    var swipeDirection = this.swipeDirection(this.state.touchObject);
     var touchSwipeLength = touchObject.swipeLength;
 
     if (this.props.infinite === false) {
@@ -253,12 +249,12 @@ var EventHandlers = {
 
       Array.from(slides).every((slide) => {
         if (!this.props.vertical) {
-          if (slide.offsetLeft - centerOffset + (getWidth(slide) / 2) > this.state.swipeLeft * -1) {
+          if (slide.offsetLeft - centerOffset + (this.getWidth(slide) / 2) > this.state.swipeLeft * -1) {
             swipedSlide = slide;
             return false;
           }
         } else {
-          if (slide.offsetTop + (getHeight(slide) / 2) > this.state.swipeLeft * -1) {
+          if (slide.offsetTop + (this.getHeight(slide) / 2) > this.state.swipeLeft * -1) {
             swipedSlide = slide;
             return false;
           }
@@ -267,9 +263,6 @@ var EventHandlers = {
         return true;
       });
 
-      if (!swipedSlide) {
-        return 0;
-      }
       const currentIndex = this.props.rtl === true ? this.state.slideCount - this.state.currentSlide : this.state.currentSlide; 
       const slidesTraversed = Math.abs(swipedSlide.dataset.index - currentIndex) || 1;
 
@@ -287,7 +280,7 @@ var EventHandlers = {
     }
     var touchObject = this.state.touchObject;
     var minSwipe = this.state.listWidth/this.props.touchThreshold;
-    var swipeDirection = getSwipeDirection(touchObject, this.props.verticalSwiping);
+    var swipeDirection = this.swipeDirection(touchObject);
 
     if (this.props.verticalSwiping) {
       minSwipe = this.state.listHeight/this.props.touchThreshold;
@@ -324,17 +317,19 @@ var EventHandlers = {
       switch (swipeDirection) {
 
         case 'left':
-        case 'up':
+        case 'down':
           newSlide = this.state.currentSlide + this.getSlideCount();
           slideCount = this.props.swipeToSlide ? this.checkNavigable(newSlide) : newSlide;
-          this.setState({ currentDirection: 0 })
+          // this.state.currentDirection = 0; // critical: change this line with setState statement
+          this.setState({ currentDirection: 0 }) // unverified fix of above line
           break;
 
         case 'right':
-        case 'down':
+        case 'up':
           newSlide = this.state.currentSlide - this.getSlideCount();
           slideCount = this.props.swipeToSlide ? this.checkNavigable(newSlide) : newSlide;
-          this.setState({ currentDirection: 1 })
+          // this.state.currentDirection = 1; // critical: change this line with setState statement
+          this.setState({ currentDirection: 1 }) // unverified fix of above line
           break;
 
         default:

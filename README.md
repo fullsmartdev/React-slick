@@ -58,11 +58,11 @@ get started with react-slick.
 ### Example
 
 ```js
-import React from 'react'
-import Slider from 'react-slick'
+var React = require('react');
+var Slider = require('react-slick');
 
 class SimpleSlider extends React.Component {
-  render () {
+  render: function () {
     var settings = {
       dots: true,
       infinite: true,
@@ -98,7 +98,7 @@ Props            | Type            | Default Value                   | Descripti
 `autoplay`       | `bool`          | `false`                         |                                                             | Yes
 `autoplaySpeed`  | `int`           | `3000`                          | Delay between each auto scroll (in milliseconds)            | Yes
 `centerMode`     | `bool`          | `false`                         | Center current slide                                        | Yes
-`centerPadding`  | `string`        | `'50px'`                        |                                                             | Yes
+`centerPadding`  |                 | `'50px'`                        |                                                             | Yes
 `cssEase`        |                 | `'ease'`                        |                                                             | Yes
 `customPaging`   | `func`          | `i => <button>{i + 1}</button>` | Custom paging templates. [Example](examples/CustomPaging.js)| Yes
 `dots`           | `bool`          | `Default`                       |                                                             | Yes
@@ -106,7 +106,7 @@ Props            | Type            | Default Value                   | Descripti
 `appendDots`     | `func`          | `dots => <ul>{dots}</ul>`       | Custom dots templates. Works same as customPaging           | Yes
 `draggable`      | `bool`          | `true`                          | Enable scrollable via dragging on desktop                   | Yes
 `easing`         | `string`        | `'linear'`                      |                                                             | Yes
-`edgeEvent`      | `func`          | `null`                          | Edge dragged event in finite case, `direction => {...}`
+`edgeEvent`      | `func`          | `null`                          | Edge dragged event in finite case, `direction => {...}`     | Yes
 `fade`           | `bool`          | `Default`                       |                                                             | Yes
 `focusOnSelect`  | `bool`          | `false`                         | Go to slide on click                                        | Yes
 `infinite`       | `bool`          | `true`                          | Infinitely wrap around contents                             | Yes

@@ -81,11 +81,11 @@ export var InnerSlider = createReactClass({
         index: nextProps.slickGoTo,
         currentSlide: this.state.currentSlide
       });
-    } else if (this.state.currentSlide >= React.Children.count(nextProps.children)) {
+    } else if (this.state.currentSlide >= nextProps.children.length) {
       this.update(nextProps);
       this.changeSlide({
         message: 'index',
-        index: React.Children.count(nextProps.children) - nextProps.slidesToShow,
+        index: nextProps.children.length - nextProps.slidesToShow,
         currentSlide: this.state.currentSlide
       });
     } else {
@@ -246,7 +246,6 @@ export var InnerSlider = createReactClass({
       onMouseEnter: this.onInnerSliderEnter,
       onMouseLeave: this.onInnerSliderLeave,
       onMouseOver: this.onInnerSliderOver,
-      dir: 'ltr',
     }
 
     if (this.props.unslick) {

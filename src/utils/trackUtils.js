@@ -1,22 +1,22 @@
-export const getPreClones = spec => {
-  if(spec.unslick || !spec.infinite) {
-    return 0
+export function getPreClones({ slideCount, variableWidth, slidesToShow, centerMode, unslick }){
+  if (unslick) return 0
+  if (variableWidth) {
+    return slideCount
   }
-  if (spec.variableWidth) {
-    return spec.slideCount
-  }
-  return spec.slidesToShow + (spec.centerMode ? 1 : 0)
+  return slidesToShow + (centerMode ? 1: 0)
 }
 
-
-export const getPostClones = spec => {
-  if (spec.unslick || !spec.infinite) {
-    return 0
-  }
-  return spec.slideCount
+export function getPostClones({ slideCount, unslick }){
+  if (unslick) return 0
+  return slideCount
 }
 
-export const getTotalSlides = spec => spec.slideCount === 1 ? 1 : getPreClones(spec) + spec.slideCount + getPostClones(spec)
+export function getTotalSlides({ variableWidth,  slideCount, slidesToShow, centerMode, unslick }){
+  if (slideCount === 1) {
+    return 1
+  }
+  return getPreClones({ slideCount, variableWidth, slidesToShow, centerMode, unslick }) + slideCount + getPostClones({ slideCount, unslick })
+}
 
 export function siblingDirection({ currentSlide, targetSlide, slidesToShow, centerMode, rtl}) {
   if (targetSlide > currentSlide) {
