@@ -1,107 +1,11 @@
 'use strict';
 import {getTrackCSS, getTrackLeft, getTrackAnimateCSS} from './trackHelper';
-import helpers from './helpers';
 import assign from 'object-assign';
 import ReactDOM from 'react-dom';
 import { siblingDirection } from '../utils/trackUtils'
 import { getWidth, getHeight, getSwipeDirection } from '../utils/innerSliderUtils'
 
 var EventHandlers = {
-  // Event handler for previous and next
-  // gets called if slide is changed via arrows or dots but not swiping/dragging
-  changeSlide: function (options) {
-    var indexOffset, previousInt, slideOffset, unevenOffset, targetSlide;
-    const {slidesToScroll, slidesToShow, centerMode, rtl} = this.props
-    const {slideCount, currentSlide} = this.state
-    unevenOffset = (slideCount % slidesToScroll !== 0);
-    indexOffset = unevenOffset ? 0 : (slideCount - currentSlide) % slidesToScroll;
-
-    if (options.message === 'previous') {
-      slideOffset = (indexOffset === 0) ? slidesToScroll : slidesToShow - indexOffset;
-      targetSlide = currentSlide - slideOffset;
-      if (this.props.lazyLoad && !this.props.infinite) {
-        previousInt = currentSlide - slideOffset;
-        targetSlide = previousInt === -1 ? slideCount -1 : previousInt;
-      }
-    } else if (options.message === 'next') {
-      slideOffset = (indexOffset === 0) ? slidesToScroll : indexOffset;
-      targetSlide = currentSlide + slideOffset;
-      if (this.props.lazyLoad && !this.props.infinite) {
-        targetSlide = ((currentSlide + slidesToScroll) % slideCount) + indexOffset;
-      }
-    } else if (options.message === 'dots') {
-      // Click on dots
-      targetSlide = options.index * options.slidesToScroll
-      if (targetSlide === options.currentSlide) {
-        return;
-      }
-    } else if (options.message === 'children') {
-      // Click on the slides
-      targetSlide = options.index
-      if (targetSlide === options.currentSlide) {
-        return
-      }
-      if (this.props.infinite) {
-        let direction = siblingDirection({currentSlide, targetSlide, slidesToShow, centerMode, slideCount, rtl})
-        if (targetSlide > options.currentSlide && direction === 'left') {
-          targetSlide = targetSlide - slideCount
-        } else if (targetSlide < options.currentSlide && direction === 'right') {
-          targetSlide = targetSlide + slideCount
-        }
-      }
-    } else if (options.message === 'index') {
-      targetSlide = Number(options.index);
-      if (targetSlide === options.currentSlide) {
-        return;
-      }
-    }
-    this.slideHandler(targetSlide);
-  },
-
-  // Accessiblity handler for previous and next
-  keyHandler: function (e) {
-    //Dont slide if the cursor is inside the form fields and arrow keys are pressed
-    if(!e.target.tagName.match('TEXTAREA|INPUT|SELECT')) {
-        if (e.keyCode === 37 && this.props.accessibility === true) {
-            this.changeSlide({
-              message: this.props.rtl === true ? 'next' :  'previous'
-            });
-        } else if (e.keyCode === 39 && this.props.accessibility === true) {
-            this.changeSlide({
-              message: this.props.rtl === true ? 'previous' : 'next'
-            });
-        }
-    }
-  },
-  // Focus on selecting a slide (click handler on track)
-  selectHandler: function (options) {
-    this.changeSlide(options)
-  },
-  // invoked when swiping/dragging starts (just once)
-  swipeStart: function (e) {
-    if (e.target.tagName === 'IMG') {
-      e.preventDefault()
-    }
-    var touches, posX, posY;
-
-    // the condition after or looked redundant
-    if ((this.props.swipe === false)) { // || ('ontouchend' in document && this.props.swipe === false)) {
-      return;
-    } else if (this.props.draggable === false && e.type.indexOf('mouse') !== -1) {
-      return;
-    }
-    posX = (e.touches !== undefined) ? e.touches[0].pageX : e.clientX;
-    posY = (e.touches !== undefined) ? e.touches[0].pageY : e.clientY;
-    this.setState({
-      dragging: true,
-      touchObject: {
-        startX: posX,
-        startY: posY,
-        curX: posX,
-        curY: posY
-      }
-    });
-  },
   // continuous invokation while swiping/dragging is going on
   swipeMove: function (e) {
     if (!this.state.dragging) {
