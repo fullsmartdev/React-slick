@@ -22,7 +22,7 @@ var defaultProps = {
     focusOnSelect: false,
     infinite: true,
     initialSlide: 0,
-    lazyLoad: null,
+    lazyLoad: false,
     pauseOnHover: true,
     responsive: null,
     rtl: false,

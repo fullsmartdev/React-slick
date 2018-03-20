@@ -2,6 +2,7 @@
 
 import React from 'react';
 import {InnerSlider} from './inner-slider';
+import assign from 'object-assign';
 import json2mq from 'json2mq';
 import defaultProps from './default-props';
 import canUseDOM from 'can-use-dom';
@@ -77,9 +78,9 @@ export default class Slider extends React.Component {
     var newProps;
     if (this.state.breakpoint) {
       newProps = this.props.responsive.filter(resp => resp.breakpoint === this.state.breakpoint);
-      settings = newProps[0].settings === 'unslick' ? 'unslick' : {...defaultProps, ...this.props, ...newProps[0].settings}
+      settings = newProps[0].settings === 'unslick' ? 'unslick' : assign({}, defaultProps, this.props, newProps[0].settings);
     } else {
-      settings = {...defaultProps, ...this.props}
+      settings = assign({}, defaultProps, this.props);
     }
 
     // force scrolling by one if centerMode is on
@@ -114,7 +115,7 @@ export default class Slider extends React.Component {
     })
 
     if (settings === 'unslick') {
-      settings = {unslick: true, ...defaultProps, ...this.props}
+      settings = assign({ unslick: true }, defaultProps, this.props)
       settings.slidesToShow = children.length
       settings.className += ' unslicked'
     } else if (children.length <= settings.slidesToShow) {

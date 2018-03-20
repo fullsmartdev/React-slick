@@ -1,43 +1,41 @@
 'use strict';
 
 import React from 'react';
+import EventHandlersMixin from './mixins/event-handlers';
+import HelpersMixin from './mixins/helpers';
 import initialState from './initial-state';
 import defaultProps from './default-props';
 import createReactClass from 'create-react-class';
 import classnames from 'classnames';
-import { getOnDemandLazySlides, extractObject, initializedState, getHeight, 
-  canGoNext, slideHandler, changeSlide, keyHandler, swipeStart, swipeMove, 
-  swipeEnd, getPreClones, getPostClones } from './utils/innerSliderUtils'
-import { getTrackLeft, getTrackCSS } from './utils/innerSliderUtils'
+import assign from 'object-assign';
+import { getOnDemandLazySlides, extractObject, initializedState } from './utils/innerSliderUtils'
+import { getTrackLeft, getTrackCSS } from './mixins/trackHelper'
 
 import { Track } from './track';
 import { Dots } from './dots';
 import { PrevArrow, NextArrow } from './arrows';
 
-export class InnerSlider extends React.Component {
-  constructor(props) {
-    super(props)
-    this.list = null
-    this.track = null
-    this.state = {
-      ...initialState,
+export var InnerSlider = createReactClass({
+  mixins: [HelpersMixin, EventHandlersMixin],
+  list: null, // wraps the track
+  track: null, // component that rolls out like a film
+  listRefHandler: function (ref) {
+    this.list = ref;
+  },
+  trackRefHandler: function (ref) {
+    this.track = ref;
+  },
+  getInitialState: function () {
+    return Object.assign({}, initialState, {
       currentSlide: this.props.initialSlide
-    }
-  }
-  listRefHandler = ref =>  this.list = ref
-  trackRefHandler = ref => this.track = ref
-  adaptHeight = () => {
-    if (this.props.adaptiveHeight && this.list) {
-      const elem = this.list.querySelector(`[data-index="${this.state.currentSlide}"]`)
-      this.list.style.height = getHeight(elem) + 'px'
-    }
-  }
-  componentWillMount = () => {
+    });
+  },
+  componentWillMount: function () {
     if (this.props.init) {
       this.props.init();
     }
     if (this.props.lazyLoad) {
-      let slidesToLoad = getOnDemandLazySlides({...this.props, ...this.state})
+      let slidesToLoad = getOnDemandLazySlides(assign({}, this.props, this.state))
       if (slidesToLoad.length > 0) {
         this.setState((prevState, props) => ({ lazyLoadedList: prevState.lazyLoadedList.concat(slidesToLoad) }))
         if (this.props.onLazyLoad) {
@@ -45,16 +43,20 @@ export class InnerSlider extends React.Component {
         }
       }
     }
-  }
-  componentDidMount = () => {
-    let spec = {listRef: this.list, trackRef: this.track, ...this.props}
-    this.updateState(spec, true, () => {
+  },
+  componentDidMount: function componentDidMount() {
+    let spec = assign({listRef: this.list, trackRef: this.track}, this.props)
+    let initState = initializedState(spec)
+    assign(spec, {slideIndex: initState.currentSlide}, initState)
+    let targetLeft = getTrackLeft(spec)
+    assign(spec, {left: targetLeft})
+    let trackStyle = getTrackCSS(spec)
+    initState['trackStyle'] = trackStyle
+    this.setState( initState, () => {
       this.adaptHeight()
-      this.props.autoplay && this.autoPlay()
+      this.autoPlay()  // it doesn't have to be here
     })
-    if (this.props.lazyLoad === 'progressive') {
-      this.lazyLoadTimer = setInterval(this.progressiveLazyLoad, 1000)
-    }
+
     // To support server-side rendering
     if (!window) {
       return
@@ -64,13 +66,10 @@ export class InnerSlider extends React.Component {
     } else {
       window.attachEvent('onresize', this.onWindowResized);
     }
-  }
-  componentWillUnmount = () => {
+  },
+  componentWillUnmount: function componentWillUnmount() {
     if (this.animationEndCallback) {
       clearTimeout(this.animationEndCallback);
-    }
-    if (this.lazyLoadTimer) {
-      clearInterval(this.lazyLoadTimer)
     }
     if (window.addEventListener) {
       window.removeEventListener('resize', this.onWindowResized);
@@ -80,10 +79,19 @@ export class InnerSlider extends React.Component {
     if (this.autoplayTimer) {
       clearInterval(this.autoplayTimer);
     }
-  }
-  componentWillReceiveProps = (nextProps) => {
-    let spec = {listRef: this.list, trackRef: this.track, ...nextProps, ...this.state}
-    this.updateState(spec, false, () => {
+  },
+  componentWillReceiveProps: function (nextProps) {
+    let spec = assign({listRef: this.list, trackRef: this.track}, nextProps, this.state)
+    let updatedState = initializedState(spec)
+    assign(spec, {slideIndex: updatedState.currentSlide}, updatedState)
+    let targetLeft = getTrackLeft(spec)
+    assign(spec, {left: targetLeft})
+    let trackStyle = getTrackCSS(spec)
+    // not setting trackStyle in other cases because no prop change can trigger slideChange
+    if (React.Children.count(this.props.children) !== React.Children.count(nextProps.children)) {
+      updatedState['trackStyle'] = trackStyle
+    }
+    this.setState(updatedState, () => {
       if (this.state.currentSlide >= React.Children.count(nextProps.children)) {
         this.changeSlide({
           message: 'index',
@@ -91,20 +99,23 @@ export class InnerSlider extends React.Component {
           currentSlide: this.state.currentSlide
         });
       }
-      if (nextProps.autoplay) {
-        this.autoPlay()
-      } else {
-        this.pause()
+      // the following doesn't have to be this way
+      if (!nextProps.autoplay) this.pause()
+      else this.autoPlay(nextProps.autoplay)
+    })
+  },
+  componentDidUpdate: function () {
+    let images = document.querySelectorAll('.slick-slide img')
+    Array.from(images).forEach(image => {
+      if (!image.onload) {
+        image.onload = () => setTimeout(() => this.update(this.props), this.props.speed)
       }
     })
-  }
-  componentDidUpdate = () => {
-    this.checkImagesLoad()
     if (this.props.reInit) {
       this.props.reInit()
     }
     if (this.props.lazyLoad) {
-      let slidesToLoad = getOnDemandLazySlides({...this.props, ...this.state})
+      let slidesToLoad = getOnDemandLazySlides(assign({}, this.props, this.state))
       if (slidesToLoad.length > 0) {
         this.setState((prevState, props) => ({ lazyLoadedList: prevState.lazyLoadedList.concat(slidesToLoad) }))
         if (this.props.onLazyLoad) {
@@ -116,218 +127,38 @@ export class InnerSlider extends React.Component {
     //   this.props.onLazyLoad([leftMostSlide])
     // }
     this.adaptHeight();
-  }
-  onWindowResized = () => {
-    let spec = {listRef: this.list, trackRef: this.track, ...this.props, ...this.state}
-    this.updateState(spec, true, () => {
-      if (this.state.autoplaying === 'playing') this.autoPlay()
-      else this.pause()
-    })
+  },
+  onWindowResized: function () {
+    this.update(this.props);
     // animating state should be cleared while resizing, otherwise autoplay stops working
     this.setState({
       animating: false
     });
     clearTimeout(this.animationEndCallback);
     delete this.animationEndCallback;
-  }
-  updateState = (spec, setTrackStyle, callback) => {
-    let updatedState = initializedState(spec)
-    spec = {...spec, ...updatedState, slideIndex: updatedState.currentSlide}
-    let targetLeft = getTrackLeft(spec)
-    spec = {...spec, left: targetLeft}
-    let trackStyle = getTrackCSS(spec)
-    if (setTrackStyle || (React.Children.count(this.props.children) !==
-      React.Children.count(spec.children))) {
-      updatedState['trackStyle'] = trackStyle
-    }
-    this.setState( updatedState, callback )
-  }
-  checkImagesLoad = () => {
-    let images = document.querySelectorAll('.slick-slide img')
-    let imagesCount = images.length,
-      loadedCount = 0
-    images.forEach(image => {
-      const handler = () => ++loadedCount &&
-          (loadedCount >= imagesCount) && this.onWindowResized()
-      if (!image.onload) {
-        if (this.props.lazyLoad) {
-          image.onload = () => this.adaptHeight() ||
-            setTimeout(this.onWindowResized, this.props.speed)
-        } else {
-          image.onload = handler
-          image.onerror = handler
-        }
-      }
-    })
-  }
-  progressiveLazyLoad = () => {
-    let slidesToLoad = []
-    const spec = {...this.props, ...this.state}
-    for(let index = this.state.currentSlide;
-      index < this.state.slideCount + getPostClones(spec); index++) {
-      if (this.state.lazyLoadedList.indexOf(index) < 0) {
-        slidesToLoad.push(index)
-        break
-      }
-    }
-    for(let index = this.state.currentSlide - 1;
-      index >= -getPreClones(spec); index--) {
-      if (this.state.lazyLoadedList.indexOf(index) < 0) {
-        slidesToLoad.push(index)
-        break
-      }
-    }
-    if (slidesToLoad.length > 0) {
-      this.setState( state => (
-        {lazyLoadedList: state.lazyLoadedList.concat(slidesToLoad)}
-      ))
-      if (this.props.onLazyLoad) {
-        this.props.onLazyLoad(slidesToLoad)
-      }
-    } else {
-      if (this.lazyLoadTimer) {
-        clearInterval(this.lazyLoadTimer)
-        delete this.lazyLoadTimer
-      }
-    }
-  }
-  slideHandler = (index) => {
-    const {
-      asNavFor, currentSlide, beforeChange, onLazyLoad, speed, afterChange
-    } = this.props
-    let {state, nextState} = slideHandler(
-      {index, ...this.props, ...this.state, trackRef: this.track})
-    if (!state) return
-    beforeChange && beforeChange(currentSlide, state.currentSlide)
-    let slidesToLoad = state.lazyLoadedList.filter(value =>
-      this.state.lazyLoadedList.indexOf(value) < 0)
-    onLazyLoad && slidesToLoad.length > 0 && onLazyLoad(slidesToLoad)
-    this.setState(state, () => {
-      asNavFor && asNavFor.innerSlider.state.currentSlide !== currentSlide
-        && asNavFor.innerSlider.slideHandler(index)
-      this.animationEndCallback = setTimeout(() => {
-        const{animating, ...firstBatch} = nextState
-        this.setState(firstBatch, () => {
-          setTimeout(() => this.setState({ animating }), 10)
-          afterChange && afterChange(state.currentSlide)
-          delete this.animationEndCallback
-        })
-      }, speed)
-    })
-
-  }
-  changeSlide = (options) => {
-    const spec = {...this.props, ...this.state}
-    let targetSlide = changeSlide(spec, options)
-    if (targetSlide !== 0 && !targetSlide) return
-    this.slideHandler(targetSlide)
-  }
-  keyHandler = (e) => {
-    let dir = keyHandler(e, this.props.accessibility, this.props.rtl)
-    dir !== '' && this.changeSlide({ message: dir })
-  }
-  selectHandler = (options) => {
-    this.changeSlide(options)
-  }
-  swipeStart = (e) => {
-    let state = swipeStart(e, this.props.swipe, this.props.draggable)
-    state !== '' && this.setState(state)
-  }
-  swipeMove = (e) => {
-    let state = swipeMove(e, {
-      ...this.props,
-      ...this.state,
-      trackRef: this.track,
-      listRef: this.list,
-      slideIndex: this.state.currentSlide
-    })
-    if (!state) return
-    this.setState(state)
-  }
-  swipeEnd = (e) => {
-    let state = swipeEnd(e, {
-      ...this.props,
-      ...this.state,
-      trackRef: this.track,
-      listRef: this.list,
-      slideIndex: this.state.currentSlide
-    })
-    if (!state) return
-    let triggerSlideHandler = state['triggerSlideHandler']
-    delete state['triggerSlideHandler']
-    this.setState(state)
-    if (triggerSlideHandler === undefined) return
-    this.slideHandler(triggerSlideHandler)
-  }
-  slickPrev = () => {
+  },
+  slickPrev: function () {
     // this and fellow methods are wrapped in setTimeout
     // to make sure initialize setState has happened before
     // any of such methods are called
     setTimeout(() => this.changeSlide({ message: 'previous' }), 0)
-  }
-  slickNext = () => {
+  },
+  slickNext: function () {
     setTimeout(() => this.changeSlide({ message: 'next' }), 0)
-  }
-  slickGoTo = (slide) => {
+  },
+  slickGoTo: function (slide) {
     slide = Number(slide)
     !isNaN(slide) && setTimeout( () => this.changeSlide({
       message: 'index',
       index: slide,
       currentSlide: this.state.currentSlide
     }), 0)
-  }
-  play = ()=> {
-    var nextIndex;
-    if (this.props.rtl) {
-      nextIndex = this.state.currentSlide - this.props.slidesToScroll;
-    } else {
-      if (canGoNext({...this.props, ...this.state})) {
-        nextIndex = this.state.currentSlide + this.props.slidesToScroll;
-      } else {
-        return false;
-      }
-    }
-
-    this.slideHandler(nextIndex);
-  }
-  autoPlay = () => {
-    if (this.autoplayTimer) {
-      console.warn("autoPlay is triggered more than once")
-      clearInterval(this.autoplayTimer)
-    }
-    this.autoplayTimer = setInterval(this.play, this.props.autoplaySpeed+50)
-    this.setState({ autoplaying: 'playing' })
-  }
-  pause = (hover=false) => {
-    if (this.autoplayTimer) {
-      clearInterval(this.autoplayTimer)
-      this.autoplayTimer = null
-    }
-    if (this.state.autoplaying === 'paused') return
-    if (hover) this.setState({ autoplaying: 'hovered' })
-    else this.setState({ autoplaying: 'paused' })
-  }
-  onInnerSliderEnter = (e) => {
-    if (this.props.autoplay && this.props.pauseOnHover) {
-      this.pause(true);
-    }
-  }
-  onInnerSliderOver = (e) => {
-    if (this.props.autoplay && this.props.pauseOnHover) {
-      this.pause(true);
-    }
-  }
-  onInnerSliderLeave = (e) => {
-    if (this.props.autoplay && this.props.pauseOnHover &&
-      this.state.autoplaying === 'hovered') {
-      this.autoPlay();
-    }
-  }
-  render = () => {
+  },
+  render: function () {
     var className = classnames('slick-initialized', 'slick-slider', this.props.className, {
       'slick-vertical': this.props.vertical,
     });
-    let spec = {...this.props, ...this.state}
+    let spec = assign({}, this.props, this.state)
     let trackProps = extractObject(spec, [
       'fade', 'cssEase', 'speed', 'infinite', 'centerMode', 'focusOnSelect',
       'currentSlide', 'lazyLoad', 'lazyLoadedList', 'rtl', 'slideWidth',
@@ -378,19 +209,18 @@ export class InnerSlider extends React.Component {
       }
     }
 
-    const listStyle = {...verticalHeightStyle, ...centerPaddingStyle}
-    const touchMove = this.props.touchMove
+    const listStyle = assign({}, verticalHeightStyle, centerPaddingStyle);
     let listProps = {
       className: 'slick-list',
       style: listStyle,
-      onMouseDown: touchMove ? this.swipeStart : null,
-      onMouseMove: this.state.dragging && touchMove ? this.swipeMove : null,
-      onMouseUp: touchMove ? this.swipeEnd : null,
-      onMouseLeave: this.state.dragging && touchMove ? this.swipeEnd : null,
-      onTouchStart: touchMove ? this.swipeStart : null,
-      onTouchMove: this.state.dragging && touchMove ? this.swipeMove : null,
-      onTouchEnd: touchMove ? this.swipeEnd : null,
-      onTouchCancel: this.state.dragging && touchMove ? this.swipeEnd : null,
+      onMouseDown: this.swipeStart,
+      onMouseMove: this.state.dragging ? this.swipeMove : null,
+      onMouseUp: this.swipeEnd,
+      onMouseLeave: this.state.dragging ? this.swipeEnd : null,
+      onTouchStart: this.swipeStart,
+      onTouchMove: this.state.dragging ? this.swipeMove : null,
+      onTouchEnd: this.swipeEnd,
+      onTouchCancel: this.state.dragging ? this.swipeEnd : null,
       onKeyDown: this.props.accessibility ? this.keyHandler : null,
     }
 
@@ -420,4 +250,4 @@ export class InnerSlider extends React.Component {
       </div>
     );
   }
-}
+});
