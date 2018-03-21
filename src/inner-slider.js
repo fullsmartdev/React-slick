@@ -151,9 +151,18 @@ export class InnerSlider extends React.Component {
     let images = document.querySelectorAll('.slick-slide img')
     let imagesCount = images.length,
       loadedCount = 0
-    images.forEach(image => {
+    Array.from(images).forEach(image => {
       const handler = () => ++loadedCount &&
           (loadedCount >= imagesCount) && this.onWindowResized()
+      if (!image.onclick) {
+        image.onclick = () => image.parentNode.focus()
+      } else {
+        const prevClick = image.onclick
+        image.onclick = () => {
+          prevClick()
+          image.parentNode.focus()
+        }
+      }
       if (!image.onload) {
         if (this.props.lazyLoad) {
           image.onload = () => this.adaptHeight() ||
