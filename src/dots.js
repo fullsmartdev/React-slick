@@ -35,8 +35,6 @@ export class Dots extends React.Component {
     // Apply join & split to Array to pre-fill it for IE8
     //
     // Credit: http://stackoverflow.com/a/13735425/1849458
-    const { onMouseEnter, onMouseOver, onMouseLeave } = this.props
-    const mouseEvents = { onMouseEnter, onMouseOver, onMouseLeave }
     var dots = Array.apply(null, Array(dotCount + 1).join('0').split('')).map((x, i) => {
 
       var leftBound = (i * this.props.slidesToScroll);
@@ -53,6 +51,7 @@ export class Dots extends React.Component {
       };
 
       var onClick = this.clickHandler.bind(this, dotOptions);
+
       return (
         <li key={i} className={className}>
           {React.cloneElement(this.props.customPaging(i), {onClick})}
@@ -60,6 +59,6 @@ export class Dots extends React.Component {
       );
     });
 
-    return React.cloneElement(this.props.appendDots(dots), {className: this.props.dotsClass, ...mouseEvents});
+    return React.cloneElement(this.props.appendDots(dots), {className: this.props.dotsClass});
   }
 }

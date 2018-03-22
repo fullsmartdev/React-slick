@@ -4,7 +4,7 @@ import { getRequiredLazySlides } from '../src/utils/innerSliderUtils'
 import { createInnerSliderWrapper, clickNext, clickPrev, 
   tryAllConfigs, actualTrackLeft, testTrackLeft
 } from './testUtils'
-import { getTrackLeft } from '../src/utils/innerSliderUtils'
+import { getTrackLeft } from '../src/mixins/trackHelper'
 
 
 const testSettings = settings => {
