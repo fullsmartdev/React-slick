@@ -3,8 +3,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom'
 import initialState from './initial-state';
-import defaultProps from './default-props';
-import createReactClass from 'create-react-class';
 import classnames from 'classnames';
 import { getOnDemandLazySlides, extractObject, initializedState, getHeight,
   canGoNext, slideHandler, changeSlide, keyHandler, swipeStart, swipeMove,
@@ -23,7 +21,8 @@ export class InnerSlider extends React.Component {
     this.track = null
     this.state = {
       ...initialState,
-      currentSlide: this.props.initialSlide
+      currentSlide: this.props.initialSlide,
+      slideCount: React.Children.count(this.props.children)
     }
     this.callbackTimers = []
   }
@@ -36,11 +35,12 @@ export class InnerSlider extends React.Component {
     }
   }
   componentWillMount = () => {
+    this.ssrInit()
     this.props.onInit && this.props.onInit()
     if (this.props.lazyLoad) {
       let slidesToLoad = getOnDemandLazySlides({...this.props, ...this.state})
       if (slidesToLoad.length > 0) {
-        this.setState((prevState, props) => ({ lazyLoadedList: prevState.lazyLoadedList.concat(slidesToLoad) }))
+        this.setState(prevState => ({ lazyLoadedList: prevState.lazyLoadedList.concat(slidesToLoad) }))
         if (this.props.onLazyLoad) {
           this.props.onLazyLoad(slidesToLoad)
         }
@@ -56,7 +56,17 @@ export class InnerSlider extends React.Component {
     if (this.props.lazyLoad === 'progressive') {
       this.lazyLoadTimer = setInterval(this.progressiveLazyLoad, 1000)
     }
-    this.ro = new ResizeObserver( entries => this.onWindowResized())
+    this.ro = new ResizeObserver( () => {
+      if (this.state.animating) {
+        this.onWindowResized(false) // don't set trackStyle hence don't break animation
+        this.callbackTimers.push(setTimeout(
+          () => this.onWindowResized(),
+          this.props.speed
+        ))
+      } else {
+        this.onWindowResized()
+      }
+    })
     this.ro.observe(this.list)
     Array.from(document.querySelectorAll('.slick-slide')).forEach( slide => {
       slide.onfocus = this.props.pauseOnFocus ? this.onSlideFocus : null
@@ -115,7 +125,7 @@ export class InnerSlider extends React.Component {
     if (this.props.lazyLoad) {
       let slidesToLoad = getOnDemandLazySlides({...this.props, ...this.state})
       if (slidesToLoad.length > 0) {
-        this.setState((prevState, props) => ({ lazyLoadedList: prevState.lazyLoadedList.concat(slidesToLoad) }))
+        this.setState(prevState => ({ lazyLoadedList: prevState.lazyLoadedList.concat(slidesToLoad) }))
         if (this.props.onLazyLoad) {
           this.props.onLazyLoad(slidesToLoad)
         }
@@ -126,10 +136,10 @@ export class InnerSlider extends React.Component {
     // }
     this.adaptHeight();
   }
-  onWindowResized = () => {
+  onWindowResized = (setTrackStyle=true) => {
     if (!ReactDOM.findDOMNode(this.track)) return
     let spec = {listRef: this.list, trackRef: this.track, ...this.props, ...this.state}
-    this.updateState(spec, true, () => {
+    this.updateState(spec, setTrackStyle, () => {
       if (this.props.autoplay) this.autoPlay('update')
       else this.pause('paused')
     })
@@ -151,6 +161,58 @@ export class InnerSlider extends React.Component {
       updatedState['trackStyle'] = trackStyle
     }
     this.setState( updatedState, callback )
+  }
+
+  ssrInit = () => {
+    if (this.props.variableWidth) {
+      let trackWidth = 0, trackLeft = 0
+      let childrenWidths = []
+      let preClones = getPreClones({...this.props, ...this.state, slideCount: this.props.children.length})
+      let postClones = getPostClones({...this.props, ...this.state, slideCount: this.props.children.length})
+      this.props.children.forEach( child => {
+        childrenWidths.push(child.props.style.width)
+        trackWidth += child.props.style.width
+      })
+      for(let i = 0; i < preClones; i++) {
+        trackLeft += childrenWidths[childrenWidths.length - 1 - i]
+        trackWidth += childrenWidths[childrenWidths.length - 1 - i]
+      }
+      for (let i = 0; i < postClones; i++) {
+        trackWidth += childrenWidths[i]
+      }
+      for (let i = 0; i < this.state.currentSlide; i++) {
+        trackLeft += childrenWidths[i]
+      }
+      let trackStyle = {
+        width: trackWidth + 'px',
+        left: -trackLeft + 'px'
+      }
+      if (this.props.centerMode) {
+        let currentWidth = `${childrenWidths[this.state.currentSlide]}px`
+        trackStyle.left = `calc(${trackStyle.left} + (100% - ${currentWidth}) / 2 ) `
+      }
+      this.setState({
+        trackStyle
+      })
+      return
+    }
+    let childrenCount = React.Children.count(this.props.children)
+    const spec = {...this.props, ...this.state, slideCount: childrenCount}
+    let slideCount = getPreClones(spec) + getPostClones(spec) + childrenCount
+    let trackWidth = (100 / this.props.slidesToShow) * slideCount
+    let slideWidth = 100 / slideCount
+    let trackLeft = -slideWidth * (getPreClones(spec) + this.state.currentSlide) * trackWidth / 100
+    if (this.props.centerMode) {
+      trackLeft += (100 - (slideWidth * trackWidth / 100)) / 2
+    }
+    let trackStyle = {
+      width: trackWidth + '%',
+      left: trackLeft + '%'
+    }
+    this.setState({
+      slideWidth: slideWidth + '%',
+      trackStyle: trackStyle
+    })
   }
   checkImagesLoad = () => {
     let images = document.querySelectorAll('.slick-slide img')
@@ -363,14 +425,14 @@ export class InnerSlider extends React.Component {
       }
     }
   }
-  onDotsOver = e => this.props.autoplay && this.pause('hovered')
-  onDotsLeave = e => this.props.autoplay &&
+  onDotsOver = () => this.props.autoplay && this.pause('hovered')
+  onDotsLeave = () => this.props.autoplay &&
     this.state.autoplaying === 'hovered' && this.autoPlay('leave')
-  onTrackOver = e => this.props.autoplay && this.pause('hovered')
-  onTrackLeave = e => this.props.autoplay &&
+  onTrackOver = () => this.props.autoplay && this.pause('hovered')
+  onTrackLeave = () => this.props.autoplay &&
     this.state.autoplaying === 'hovered' && this.autoPlay('leave')
-  onSlideFocus = e => this.props.autoplay && this.pause('focused')
-  onSlideBlur = e => this.props.autoplay &&
+  onSlideFocus = () => this.props.autoplay && this.pause('focused')
+  onSlideBlur = () => this.props.autoplay &&
     this.state.autoplaying === 'focused' && this.autoPlay('blur')
 
   render = () => {
@@ -467,7 +529,6 @@ export class InnerSlider extends React.Component {
       listProps = { className: 'slick-list' }
       innerSliderProps = { className }
     }
-
     return (
       <div {...innerSliderProps} >
         { !this.props.unslick ? prevArrow : '' }

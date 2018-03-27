@@ -4,8 +4,8 @@ import React from 'react';
 import {InnerSlider} from './inner-slider';
 import json2mq from 'json2mq';
 import defaultProps from './default-props';
-import canUseDOM from 'can-use-dom';
-const enquire = canUseDOM && require('enquire.js');
+import { canUseDOM } from './utils/innerSliderUtils'
+const enquire = canUseDOM() && require('enquire.js');
 
 export default class Slider extends React.Component {
 
@@ -41,7 +41,7 @@ export default class Slider extends React.Component {
           bQuery = json2mq({minWidth: breakpoints[index-1] + 1, maxWidth: breakpoint});
         }
         // when not using server side rendering
-        canUseDOM && this.media(bQuery, () => {
+        canUseDOM() && this.media(bQuery, () => {
           this.setState({breakpoint: breakpoint});
         })
       });
@@ -50,7 +50,7 @@ export default class Slider extends React.Component {
       // convert javascript object to media query string
       let query = json2mq({minWidth: breakpoints.slice(-1)[0]});
 
-      canUseDOM && this.media(query, () => {
+      canUseDOM() && this.media(query, () => {
         this.setState({breakpoint: null});
       });
     }
@@ -113,20 +113,62 @@ export default class Slider extends React.Component {
       return !!child
     })
 
+    // rows and slidesPerRow logic is handled here
+    if (settings.variableWidth && (settings.rows > 1 || settings.slidesPerRow > 1)) {
+      console.warn(`variableWidth is not supported in case of rows > 1 or slidesPerRow > 1`)
+      settings.variableWidth = false
+    }
+    let newChildren = []
+    let currentWidth = null
+    for (let i = 0; i < children.length; i += settings.rows * settings.slidesPerRow) {
+      let newSlide = []
+      for (let j = i; j < i + settings.rows * settings.slidesPerRow; j += settings.slidesPerRow) {
+        let row = []
+        for (let k = j; k < j + settings.slidesPerRow; k += 1) {
+          if (settings.variableWidth && children[k].props.style) {
+            currentWidth = children[k].props.style.width
+          }
+          if (k >= children.length) break
+          row.push(React.cloneElement(children[k], {style: {
+            width: `${100 / settings.slidesPerRow}%`,
+            display: 'inline-block'
+          }}))
+        }
+        newSlide.push((
+          <div>
+            {row}
+          </div>
+        ))
+      }
+      if (settings.variableWidth) {
+        newChildren.push((
+          <div style={{ width: currentWidth }}>
+            {newSlide}
+          </div>
+        ))
+      } else {
+        newChildren.push((
+          <div>
+            {newSlide}
+          </div>
+        ))
+      }
+    }
+
     if (settings === 'unslick') {
 
       const className = 'regular slider ' + (this.props.className || '')
       return (
         <div className={className}>
-          {children}
+          {newChildren}
         </div>
       )
-    } else if (children.length <= settings.slidesToShow) {
+    } else if (newChildren.length <= settings.slidesToShow) {
       settings.unslick = true
     }
     return (
       <InnerSlider ref={this.innerSliderRefHandler} {...settings}>
-        {children}
+        {newChildren}
       </InnerSlider>
     )
   }
