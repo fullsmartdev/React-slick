@@ -3,7 +3,6 @@ import Slider from "../src/slider";
 
 export default class SlideChangeHooks extends Component {
   state = {
-    oldSlide: 0,
     activeSlide: 0,
     activeSlide2: 0
   };
@@ -14,16 +13,12 @@ export default class SlideChangeHooks extends Component {
       speed: 1000,
       slidesToShow: 1,
       slidesToScroll: 1,
-      beforeChange: (current, next) =>
-        this.setState({ oldSlide: current, activeSlide: next }),
+      beforeChange: (current, next) => this.setState({ activeSlide: next }),
       afterChange: current => this.setState({ activeSlide2: current })
     };
     return (
       <div>
         <h2>beforeChange and afterChange hooks</h2>
-        <p>
-          BeforeChange => oldSlide: <strong>{this.state.oldSlide}</strong>
-        </p>
         <p>
           BeforeChange => activeSlide: <strong>{this.state.activeSlide}</strong>
         </p>
