@@ -7,9 +7,6 @@ var webpack = require("webpack");
 var WebpackDevServer = require("webpack-dev-server");
 var runSequence = require("run-sequence");
 var assign = require("object-assign");
-var opn = require("opn");
-
-const DEV_PORT = 8080;
 
 gulp.task("default", ["watch", "server"]);
 
@@ -65,13 +62,9 @@ gulp.task("server", ["watch", "copy", "sass"], function(callback) {
     contentBase: "./build",
     hot: true,
     debug: true
-  }).listen(DEV_PORT, "0.0.0.0", function(err, result) {
+  }).listen(8080, "0.0.0.0", function(err, result) {
     if (err) {
       console.log(err);
-    } else {
-      const server_url = `http://localhost:${DEV_PORT}`;
-      console.log(`> Dev Server started at ${server_url}`);
-      opn(server_url);
     }
   });
   callback();
