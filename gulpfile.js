@@ -8,8 +8,6 @@ var WebpackDevServer = require("webpack-dev-server");
 var assign = require("object-assign");
 var opn = require("opn");
 
-var UglifyJsPlugin = require("uglifyjs-webpack-plugin");
-
 const DEV_PORT = 8080;
 
 gulp.task("clean", function() {
@@ -56,7 +54,7 @@ gulp.task(
 
 gulp.task(
   "server",
-  gulp.series(["watch", "copy", "sass"], function() {
+  gulp.series(["watch", "copy", "sass"], function(done) {
     console.log("Start");
     var myConfig = require("./webpack.config");
     myConfig.plugins = myConfig.plugins.concat(
@@ -70,10 +68,8 @@ gulp.task(
     new WebpackDevServer(webpack(myConfig), {
       contentBase: "./build",
       hot: true,
-      stats: {
-        colors: true
-      }
-    }).listen(DEV_PORT, "localhost", function(err, result) {
+      debug: true
+    }).listen(DEV_PORT, "0.0.0.0", function(err, result) {
       if (err) {
         console.log(err);
       } else {
@@ -82,6 +78,7 @@ gulp.task(
         opn(server_url);
       }
     });
+    done();
   })
 );
 
@@ -94,7 +91,6 @@ var distConfig = require("./webpack.config.dist.js");
 gulp.task("dist-unmin", function(cb) {
   var unminConfig = assign({}, distConfig);
   unminConfig.output.filename = "react-slick.js";
-  unminConfig.mode = "none";
   return webpack(unminConfig, function(err, stat) {
     console.error(err);
     cb();
@@ -105,11 +101,8 @@ gulp.task("dist-min", function(cb) {
   var minConfig = assign({}, distConfig);
   minConfig.output.filename = "react-slick.min.js";
   minConfig.plugins = minConfig.plugins.concat(
-    new UglifyJsPlugin({
-      cache: true,
-      parallel: true,
-      sourceMap: true,
-      uglifyOptions: {
+    new webpack.optimize.UglifyJsPlugin({
+      compressor: {
         warnings: false
       }
     })
