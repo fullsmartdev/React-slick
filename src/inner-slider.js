@@ -1,7 +1,6 @@
 "use strict";
 
 import React from "react";
-import ReactDOM from "react-dom";
 import initialState from "./initial-state";
 import debounce from "lodash.debounce";
 import classnames from "classnames";
@@ -195,7 +194,9 @@ export class InnerSlider extends React.Component {
     this.debouncedResize();
   };
   resizeWindow = (setTrackStyle = true) => {
-    if (!ReactDOM.findDOMNode(this.track)) return;
+    const isTrackMounted = Boolean(this.track && this.track.node);
+    // prevent warning: setting state on unmounted component (server side rendering)
+    if (!isTrackMounted) return;
     let spec = {
       listRef: this.list,
       trackRef: this.track,
@@ -391,7 +392,7 @@ export class InnerSlider extends React.Component {
     onLazyLoad && slidesToLoad.length > 0 && onLazyLoad(slidesToLoad);
     this.setState(state, () => {
       asNavFor &&
-        asNavFor.innerSlider.state.currentSlide !== this.state.currentSlide &&
+        asNavFor.innerSlider.state.currentSlide !== currentSlide &&
         asNavFor.innerSlider.slideHandler(index);
       if (!nextState) return;
       this.animationEndCallback = setTimeout(() => {
