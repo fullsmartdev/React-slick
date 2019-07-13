@@ -711,8 +711,7 @@ export class InnerSlider extends React.Component {
 
     let innerSliderProps = {
       className: className,
-      dir: "ltr",
-      style:this.props.style
+      dir: "ltr"
     };
 
     if (this.props.unslick) {
