@@ -68,6 +68,16 @@ const getSlideStyle = spec => {
       spec.speed +
       "ms " +
       spec.cssEase;
+    style.WebkitTransition =
+      "opacity " +
+      spec.speed +
+      "ms " +
+      spec.cssEase +
+      ", " +
+      "visibility " +
+      spec.speed +
+      "ms " +
+      spec.cssEase;
   }
 
   return style;
