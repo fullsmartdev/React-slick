@@ -97,6 +97,10 @@ export class InnerSlider extends React.Component {
         slide.onblur = this.props.pauseOnFocus ? this.onSlideBlur : null;
       }
     );
+    // To support server-side rendering
+    if (!window) {
+      return;
+    }
     if (window.addEventListener) {
       window.addEventListener("resize", this.onWindowResized);
     } else {
@@ -704,8 +708,8 @@ export class InnerSlider extends React.Component {
 
     let innerSliderProps = {
       className: className,
-      dir: this.props.rtl ? "rtl" : "ltr",
-      style: this.props.style
+      dir: "ltr",
+      style:this.props.style
     };
 
     if (this.props.unslick) {
