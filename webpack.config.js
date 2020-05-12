@@ -5,7 +5,7 @@ module.exports = {
   mode: "production",
   devtool: "source-map",
   entry: {
-    "docs.js": "./docs/index.js"
+    "docs.js": "./docs/index.jsx"
   },
   output: {
     path: path.join(__dirname, "build"),
